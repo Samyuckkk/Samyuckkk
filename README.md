@@ -1,5 +1,5 @@
 <div align="center">
-  <img height="150" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcTJwMnlpZW5uanQ1ZXI3Y3YzamV6YWlwZXVscjdpcnRleHI3dXlzYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/l2WFnslyQJifg6cRao/giphy.gif"  />
+  <img height="250" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcTJwMnlpZW5uanQ1ZXI3Y3YzamV6YWlwZXVscjdpcnRleHI3dXlzYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/l2WFnslyQJifg6cRao/giphy.gif"  />
 </div>
 
 ###
@@ -8,7 +8,7 @@
 
 <div align="center">
 
-[![Typing SVG](https://readme-typing-svg.demolab.com?font=Bitcount+Grid+Double&size=50&pause=1000&center=true&vCenter=true&width=800&lines=Hi+👋!+I'm+Samyak+Oholkar)](https://git.io/typing-svg)
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Bitcount+Grid+Double&size=50&pause=1500&center=true&vCenter=true&width=800&lines=Hi%F0%9F%91%8B!+I'm+Samyak+Oholkar+)](https://git.io/typing-svg)
 
 </div>
 
