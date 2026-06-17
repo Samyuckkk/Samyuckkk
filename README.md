@@ -14,6 +14,7 @@
 
 ###
 
+
 <p align="center">I'm a Computer Science student who loves turning ideas into real-world applications. I enjoy building scalable backend systems, AI-powered solutions, and full-stack web applications. When I'm not coding, you'll probably find me solving DSA problems, participating in hackathons, or adding "just one more feature" to a side project.</p>
 
 ###
@@ -27,10 +28,13 @@
 ###
 
 <div align="center">
+  <img src="https://raw.githubusercontent.com/Samyuckkk/Samyuckkk/stats-output/stats.svg" height="150" alt="stats graph"  />
   <img src="https://streak-stats.demolab.com?user=Samyuckkk&locale=en&mode=daily&theme=dracula&hide_border=false&border_radius=5&order=3" height="150" alt="streak graph"  />
 </div>
 
 ###
+
+<br clear="both">
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Samyuckkk/Samyuckkk/pacman-output/breakout-contribution-graph-dark.svg">
@@ -41,12 +45,18 @@
 ###
 
 <div>
-  <img style="100%" src="https://capsule-render.vercel.app/api?type=waving&height=80&section=header&reversal=false&fontSize=70&fontColor=FFFFFF&fontAlign=50&fontAlignY=50&stroke=-&animation=blink&descSize=20&descAlign=50&descAlignY=50&color=gradient"  />
+  <img style="100%" src="https://capsule-render.vercel.app/api?type=waving&height=80&section=footer&reversal=false&fontSize=70&fontColor=FFFFFF&fontAlign=50&fontAlignY=50&stroke=-&animation=blink&descSize=20&descAlign=50&descAlignY=50&theme=cobalt"  />
 </div>
 
 ###
 
 <h2 align="center">⚔️ Weapons of Choice</h2>
+
+###
+
+<br clear="both">
+
+<img align="right" height="200" src="https://media1.tenor.com/m/Dmimutp0T7kAAAAC/200iq-helloworld.gif"  />
 
 ###
 
@@ -65,12 +75,6 @@
   <img width="12" />
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" height="35" alt="html5 logo"  />
 </div>
-
-###
-
-<br clear="both">
-
-<img align="right" height="200" src="https://media1.tenor.com/m/Dmimutp0T7kAAAAC/200iq-helloworld.gif"  />
 
 ###
 
