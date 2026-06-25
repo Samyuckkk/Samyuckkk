@@ -109,7 +109,7 @@ async function getAllProjects(req, res){
 
     } catch (err) {
         res.status(500).json({
-            success: true,
+            success: false,
             message: err.message
         })
     }
