@@ -1,4 +1,5 @@
 const achievementModel = require('../models/achievement.model')
+const storageService = require('../services/storage.service')
 
 async function createAchievement(req, res){
     try{
@@ -7,8 +8,28 @@ async function createAchievement(req, res){
             description,
             linkedinLink,
             featured,
-            screenshots
         } = req.body
+
+        let screenshots = []
+
+        if(req.files && req.files.length > 0){
+            for(const file of req.files){
+                const result = await storageService.uploadFile(
+                    file.buffer,
+                    uuid(),
+                    "Portfolio/Achievements"
+                )
+
+                if(!result?.url){
+                    return res.status(500).json({
+                        success: false,
+                        message: "Upload failed",
+                    })
+                }
+
+                screenshots.push(result.url)
+            }
+        }
     
         const achievement = await achievementModel.create({
             title,
@@ -36,9 +57,37 @@ async function updateAchievement(req, res){
     try{
         const {id} = req.params
 
+        const achievement = await achievementModel.findById(id)
+
+        let screenshots = achievement.screenshots
+
+        if(req.files && req.files.length > 0){
+            screenshots = []
+
+            for(const file of req.files){
+                const result = await storageService.uploadFile(
+                    file.buffer,
+                    uuid(),
+                    "Portfolio/Achievements"
+                )
+
+                if(!result?.url){
+                    return res.status(500).json({
+                        success: false,
+                        message: "Upload failed"
+                    })
+                }
+
+                screenshots.push(result.url)
+            }
+        }
+
         const updatedAchievement = await achievementModel.findByIdAndUpdate(
             id,
-            req.body,
+            {
+                ...req.body,
+                screenshots
+            },
             {
                 new: true,
                 runValidators: true

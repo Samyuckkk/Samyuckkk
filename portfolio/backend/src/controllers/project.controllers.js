@@ -1,4 +1,6 @@
 const projectModel = require('../models/project.model')
+const storageService = require('../services/storage.service')
+const {v4 : uuid} = require('uuid')
 
 async function createProject(req, res){
     try{
@@ -8,10 +10,30 @@ async function createProject(req, res){
             date,
             githubLink,
             deploymentLink,
-            screenshots,
             technologies,
             featured
         } = req.body
+
+        let screenshots = []
+
+        if(req.files && req.files.length > 0){
+            for(const file of req.files){
+                const result = await storageService.uploadFile(
+                    file.buffer,
+                    uuid(),
+                    "Portfolio/Projects"    
+                )
+
+                if(!result?.url){
+                    return res.status(500).json({
+                        success: false,
+                        message: "Upload failed"
+                    })
+                }
+
+                screenshots.push(result.url)
+            }
+        }
     
         const project = await projectModel.create({
             title,
@@ -42,9 +64,44 @@ async function updateProject(req, res){
     try{
         const {id} = req.params
 
+        const project = await projectModel.findById(id)
+
+        if(!project){
+            return res.status(404).json({
+                success: false,
+                message: "Project not found"
+            })
+        }
+
+        let screenshots = project.screenshots
+
+        if(req.files && req.files.length > 0){
+            screenshots = []
+            
+            for(const file of req.files){
+                const result = await storageService.uploadFile(
+                    file.buffer,
+                    uuid(),
+                    "Portfolio/Projects"
+                )
+
+                if(!result?.url){
+                    return res.status(500).json({
+                        success: false,
+                        message: "Upload failed"
+                    })
+                }
+
+                screenshots.push(result.url)
+            }
+        }
+
         const updatedProject = await projectModel.findByIdAndUpdate(
             id,
-            req.body,
+            {
+                ...req.body,
+                screenshots
+            },
             {
                 new: true,
                 runValidators: true
@@ -109,7 +166,7 @@ async function getAllProjects(req, res){
 
     } catch (err) {
         res.status(500).json({
-            success: true,
+            success: false,
             message: err.message
         })
     }

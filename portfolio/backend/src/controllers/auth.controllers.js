@@ -72,7 +72,69 @@ async function loginAdmin(req, res){
     })
 }
 
+async function getAdminProfile(req, res){
+    try {
+        const id = req.admin._id
+
+        const admin = await adminModel.findById(id).select("-password")
+
+        if(!admin){
+            return res.status(404).json({
+                success: false,
+                message: "Admin not found"
+            })
+        }
+
+        res.status(200).json({
+            success: true,
+            admin
+        })
+
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        })
+    }
+}
+
+async function updateAdminProfile(req, res){
+    try {
+        const id = req.admin._id
+
+        const updatedAdmin = await adminModel.findByIdAndUpdate(
+            id,
+            req.body,
+            {
+                new: true,
+                runValidators: true
+            }
+        ).select("-password")
+
+        if(!updatedAdmin){
+            return res.status(404).json({
+                success: false,
+                message: "Admin not found"
+            })
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Admin profile updated successfully",
+            admin: updatedAdmin
+        })
+        
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        })
+    }
+}
+
 module.exports = {
     registerAdmin,
-    loginAdmin
+    loginAdmin,
+    updateAdminProfile,
+    getAdminProfile
 }
