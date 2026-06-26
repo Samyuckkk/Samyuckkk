@@ -12,6 +12,8 @@ async function uploadFile(file, fileName, folder){
         fileName,
         folder
     })
+
+    return result
 }
 
 module.exports = {
