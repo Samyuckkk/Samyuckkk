@@ -1,11 +1,18 @@
 const express = require('express')
 const cookieParser = require('cookie-parser')
+const cors = require('cors')
+
 const authRoutes = require('./routes/auth.routes')
 const projectRoutes = require('./routes/project.routes')
 const experienceRoutes = require('./routes/experience.routes')
 const achievementRoutes = require('./routes/achievement.routes')
 
 const app = express()
+
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true
+}))
 
 app.use(cookieParser())
 app.use(express.json())
