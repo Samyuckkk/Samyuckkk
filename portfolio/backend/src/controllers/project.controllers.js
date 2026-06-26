@@ -103,7 +103,7 @@ async function updateProject(req, res){
                 screenshots
             },
             {
-                new: true,
+                returnDocument: "after",
                 runValidators: true
             }
         )

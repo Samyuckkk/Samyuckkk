@@ -1,5 +1,6 @@
 const achievementModel = require('../models/achievement.model')
 const storageService = require('../services/storage.service')
+const {v4: uuid} = require('uuid')
 
 async function createAchievement(req, res){
     try{
@@ -89,7 +90,7 @@ async function updateAchievement(req, res){
                 screenshots
             },
             {
-                new: true,
+                returnDocument: "after",
                 runValidators: true
             }
         )

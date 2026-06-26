@@ -50,7 +50,7 @@ async function updateExperience(req, res){
             id,
             req.body,
             {
-                new: true,
+                returnDocument: "after",
                 runValidators: true
             }
         )
