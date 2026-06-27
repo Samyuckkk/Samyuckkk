@@ -6,6 +6,7 @@
 
 <!-- <h3 align="center">Hi 👋! I'm Samyak Oholkar</h3> -->
 
+<!-- Animated Text -->
 <div align="center">
 
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=Bitcount+Grid+Double&size=50&pause=1500&center=true&vCenter=true&width=800&lines=Hi%F0%9F%91%8B!+I'm+Samyak+Oholkar+)](https://git.io/typing-svg)
