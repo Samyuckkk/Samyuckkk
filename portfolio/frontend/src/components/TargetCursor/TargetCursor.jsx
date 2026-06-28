@@ -315,30 +315,11 @@ const TargetCursor = ({
 
       gsap.to(activeStrengthRef, { current: 1, duration: hoverDuration, ease: 'power2.out' });
 
-      // Dispatch event for debug overlay
-      window.dispatchEvent(new CustomEvent('target-change', {
-        detail: {
-          tagName: target.tagName,
-          className: target.className,
-          rect: {
-            left: rect.left,
-            top: rect.top,
-            width: rect.width,
-            height: rect.height
-          }
-        }
-      }));
-
       const leaveHandler = () => {
         gsap.ticker.remove(tickerFnRef.current);
         isActiveRef.current = false;
         targetCornerPositionsRef.current = null;
         gsap.set(activeStrengthRef, { current: 0, overwrite: true });
-        
-        // Dispatch debug release event
-        window.dispatchEvent(new CustomEvent('target-change', {
-          detail: null
-        }));
 
         activeTarget = null;
 
