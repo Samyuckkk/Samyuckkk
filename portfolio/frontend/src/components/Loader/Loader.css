@@ -1,0 +1,56 @@
+.loader {
+    position: fixed;
+    inset: 0;
+
+    background: #000;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    overflow: hidden;
+
+    z-index: 9999;
+}
+
+.loader-content {
+    position: relative;
+    z-index: 2;
+
+    text-align: center;
+}
+
+.loader p {
+    color: #FFD400;
+
+    font-size: 1.4rem;
+
+    letter-spacing: 6px;
+
+    margin-bottom: 20px;
+
+    text-transform: uppercase;
+}
+
+.loader h1 {
+    color: #FFD400;
+
+    font-size: clamp(3rem, 8vw, 7rem);
+
+    font-weight: 800;
+
+    letter-spacing: 8px;
+}
+
+.circle {
+    position: absolute;
+
+    width: 120px;
+    height: 120px;
+
+    border-radius: 50%;
+
+    background: #FFD400;
+
+    z-index: 1;
+}
