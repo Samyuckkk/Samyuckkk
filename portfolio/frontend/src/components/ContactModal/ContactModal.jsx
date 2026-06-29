@@ -168,14 +168,14 @@ export default function ContactModal({ isOpen, onClose }) {
         🎉
     </div>
 
-    <h3
+    <div
         className="font-extrabold font-outfit"
         style={{
             fontSize: "38px"
         }}
     >
         Message Sent!
-    </h3>
+    </div>
 
     <p
         className="text-gray-800 font-outfit"
@@ -207,7 +207,7 @@ export default function ContactModal({ isOpen, onClose }) {
                                     <div className="mb-2" style={{
         marginBottom: "15px"
     }}>
-                                        <h3 className="text-3xl font-extrabold font-outfit tracking-tight text-black">Contact Me</h3>
+                                        <div className="text-3xl font-extrabold font-outfit tracking-tight text-black">Contact Me</div>
                                         {/* <p className="text-sm text-gray-700 font-outfit mt-1">I'd love to hear from you! Fill out the form and I'll get back to you soon.</p> */}
                                     </div>
 
@@ -374,13 +374,22 @@ export default function ContactModal({ isOpen, onClose }) {
                                         </button>
                                         
                                         {/* Low-impact Clear button to preserve reference image visuals */}
+
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                justifyContent: "center",
+                                                width: "100%"
+                                            }}
+                                        >
                                         <button
                                             type="button"
                                             onClick={handleClear}
-                                            className="text-xs text-gray-700 hover:text-black font-semibold font-outfit transition-colors underline cursor-target cursor-none py-1"
+                                            className="text-xs text-gray-700 hover:text-black font-semibold font-outfit transition-colors underline cursor-target cursor-none py-1 w-fit mx-auto"
                                         >
                                             Clear Form
                                         </button>
+                                        </div>
                                     </div>
                                 </form>
                             )}
