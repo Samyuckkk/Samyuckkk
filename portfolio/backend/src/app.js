@@ -6,6 +6,7 @@ const authRoutes = require('./routes/auth.routes')
 const projectRoutes = require('./routes/project.routes')
 const experienceRoutes = require('./routes/experience.routes')
 const achievementRoutes = require('./routes/achievement.routes')
+const contactRoutes = require('./routes/contact.routes')
 
 const app = express()
 
@@ -25,5 +26,6 @@ app.use('/auth', authRoutes)
 app.use('/project', projectRoutes)
 app.use('/achievements', achievementRoutes)
 app.use('/experience', experienceRoutes)
+app.use('/contact', contactRoutes)
 
 module.exports = app

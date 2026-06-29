@@ -167,7 +167,7 @@ function App() {
                                 position: 'fixed',
                                 left: mousePos.x,
                                 top: mousePos.y,
-                                transform: 'translate(-50%, -135%)',
+                                transform: 'translate(20px, -50%)',
                                 pointerEvents: 'none',
                                 zIndex: 9999,
                             }}
