@@ -76,9 +76,9 @@ async function loginAdmin(req, res){
 
 async function getAdminProfile(req, res){
     try {
-        const id = req.admin._id
+        // const id = req.admin._id
 
-        const admin = await adminModel.findById(id).select("-password")
+        const admin = await adminModel.find().select("-password")
 
         if(!admin){
             return res.status(404).json({
