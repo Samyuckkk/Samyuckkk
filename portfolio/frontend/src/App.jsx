@@ -160,7 +160,7 @@ function App() {
                                 paddingLeft: "10px",
                                 paddingRight: "10px",
                                 paddingTop: "6px",
-                                paddingBottom: "6px",
+                                paddingBottom: "8px",
                             }}
                             staggerFrom={"first"}
                             staggerDuration={0.025}
