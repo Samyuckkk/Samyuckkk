@@ -5,6 +5,7 @@ import Loader from "./components/Loader/Loader";
 import TargetCursor from "./components/TargetCursor/TargetCursor";
 import Magnet from "./components/Magnet/Magnet";
 import RotatingText from "./components/RotatingText/RotatingText";
+import ContactModal from "./components/ContactModal/ContactModal";
 
 import avatarBW from "./assets/2D Vector Black&White.png";
 import avatarColor from "./assets/2D Vector Colored.png";
@@ -21,6 +22,8 @@ function App() {
     ];
     const [messageIndex, setMessageIndex] = useState(-1);
     const [isHovered, setIsHovered] = useState(false);
+    const [isContactHovered, setIsContactHovered] = useState(false);
+    const [isContactModalOpen, setIsContactModalOpen] = useState(false);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
     const handleMouseEnter = () => {
@@ -30,6 +33,14 @@ function App() {
 
     const handleMouseLeave = () => {
         setIsHovered(false);
+    };
+
+    const handleContactMouseEnter = () => {
+        setIsContactHovered(true);
+    };
+
+    const handleContactMouseLeave = () => {
+        setIsContactHovered(false);
     };
 
     const handleMouseMove = (e) => {
@@ -184,6 +195,58 @@ function App() {
                         </div>
                     )}
                 </AnimatePresence>
+
+                {/* Contact Me Button - Positioned at top left */}
+                <div className="absolute top-10 left-10 z-[100]">
+                    <Magnet 
+                        padding={15} 
+                        magnetStrength={5}
+                        wrapperClassName="cursor-target"
+                    >
+                        <button
+                            className="border-2 border-[#111] rounded-md text-[#111] bg-transparent font-bold text-base tracking-wider uppercase select-none transition-all duration-300 hover:bg-[#111] hover:text-[#FFD500] cursor-none"
+                            style={{ fontFamily: "'Bricolage Grotesque', sans-serif", padding: "15px 15px"}}
+                            onClick={() => setIsContactModalOpen(true)}
+                            onMouseEnter={handleContactMouseEnter}
+                            onMouseLeave={handleContactMouseLeave}
+                            onMouseMove={handleMouseMove}
+                        >
+                            Contact Me
+                        </button>
+                    </Magnet>
+                </div>
+
+                {/* Contact message pop-up */}
+                <AnimatePresence>
+                    {isContactHovered && (
+                        <div 
+                            style={{
+                                position: 'fixed',
+                                left: mousePos.x,
+                                top: mousePos.y,
+                                transform: 'translate(20px, -50%)',
+                                pointerEvents: 'none',
+                                zIndex: 9999,
+                            }}
+                        >
+                            <motion.div 
+                                className="avatar-message-pop font-outfit"
+                                initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.8, y: 10 }}
+                                transition={{ type: 'spring', damping: 15, stiffness: 200 }}
+                            >
+                                Let's connect!
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* Contact Pop-up Form Modal */}
+                <ContactModal 
+                    isOpen={isContactModalOpen} 
+                    onClose={() => setIsContactModalOpen(false)} 
+                />
             </motion.div>
         </>
     );
