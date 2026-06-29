@@ -14,6 +14,28 @@ import "./index.css";
 function App() {
     const [loading, setLoading] = useState(true);
 
+    const messages = [
+        "Hire me before someone else does!",
+        "I write code. You provide the paycheck. Deal?",
+        "I'm one \"Hello!\" away from joining your team."
+    ];
+    const [messageIndex, setMessageIndex] = useState(-1);
+    const [isHovered, setIsHovered] = useState(false);
+    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+    const handleMouseEnter = () => {
+        setIsHovered(true);
+        setMessageIndex(prev => (prev + 1) % messages.length);
+    };
+
+    const handleMouseLeave = () => {
+        setIsHovered(false);
+    };
+
+    const handleMouseMove = (e) => {
+        setMousePos({ x: e.clientX, y: e.clientY });
+    };
+
     useEffect(() => {
         const timer = setTimeout(() => {
             setLoading(false);
@@ -83,7 +105,7 @@ function App() {
 
                     {/* Line 2: Oholkar */}
                     <span className="hero-name-line name-oholkar select-none">
-                        OHOLKAR
+                        Oholkar
                     </span>
 
                     {/* Magnetized Hoverable Avatar Card */}
@@ -92,7 +114,12 @@ function App() {
                         magnetStrength={7}
                         wrapperClassName="avatar-magnet cursor-target"
                     >
-                        <div className="avatar-card">
+                        <div 
+                            className="avatar-card"
+                            onMouseEnter={handleMouseEnter}
+                            onMouseLeave={handleMouseLeave}
+                            onMouseMove={handleMouseMove}
+                        >
                             <img 
                                 src={avatarBW} 
                                 alt="Samyak Oholkar (Black & White)" 
@@ -108,32 +135,55 @@ function App() {
                 </motion.div>
 
                 {/* Rotating Text Badge - Positioned at bottom right */}
-                <div className="absolute bottom-8 right-8 z-[100]">
+                <div className="absolute bottom-8 right-8 z-[100] flex items-center gap-2.5 font-bold text-xl sm:text-2xl select-none">
+                    <span className="text-[#111] font-extrabold tracking-tight">Creative</span>
                     <Magnet 
                         padding={5} 
                         magnetStrength={4}
                         wrapperClassName="cursor-target"
                     >
-                        <div className="flex items-center gap-2.5 font-bold text-xl sm:text-2xl select-none">
-                            <span className="text-[#111] font-extrabold tracking-tight">Creative</span>
-                            <RotatingText
-                                texts={['developer!', 'problem solver!', 'learner!', 'builder!']}
-                                // mainClassName="px-4 py-1.5 bg-[#A855F7] text-white rounded-md overflow-hidden font-extrabold inline-flex items-center justify-center"
-                                mainClassName="bg-[#A855F7] text-white rounded-md"
-                                style={{
-                                    paddingLeft: "10px",
-                                    paddingRight: "10px",
-                                    paddingTop: "6px",
-                                    paddingBottom: "6px",
-                                }}
-                                staggerFrom={"first"}
-                                staggerDuration={0.025}
-                                rotationInterval={2500}
-                                transition={{ type: "spring", damping: 30, stiffness: 400 }}
-                            />
-                        </div>
+                        <RotatingText
+                            texts={['developer!', 'problem solver!', 'learner!', 'builder!']}
+                            mainClassName="bg-[#A855F7] text-white rounded-md"
+                            style={{
+                                paddingLeft: "10px",
+                                paddingRight: "10px",
+                                paddingTop: "6px",
+                                paddingBottom: "6px",
+                            }}
+                            staggerFrom={"first"}
+                            staggerDuration={0.025}
+                            rotationInterval={2500}
+                            transition={{ type: "spring", damping: 30, stiffness: 400 }}
+                        />
                     </Magnet>
                 </div>
+
+                {/* Mouse-following Sequential message pop-up */}
+                <AnimatePresence>
+                    {isHovered && messageIndex >= 0 && (
+                        <div 
+                            style={{
+                                position: 'fixed',
+                                left: mousePos.x,
+                                top: mousePos.y,
+                                transform: 'translate(-50%, -135%)',
+                                pointerEvents: 'none',
+                                zIndex: 9999,
+                            }}
+                        >
+                            <motion.div 
+                                className="avatar-message-pop font-outfit"
+                                initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.8, y: 10 }}
+                                transition={{ type: 'spring', damping: 15, stiffness: 200 }}
+                            >
+                                {messages[messageIndex]}
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
             </motion.div>
         </>
     );
