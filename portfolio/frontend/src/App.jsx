@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Loader from "./components/Loader/Loader";
 import TargetCursor from "./components/TargetCursor/TargetCursor";
 import Magnet from "./components/Magnet/Magnet";
+import RotatingText from "./components/RotatingText/RotatingText";
 
 import avatarBW from "./assets/2D Vector Black&White.png";
 import avatarColor from "./assets/2D Vector Colored.png";
@@ -105,6 +106,34 @@ function App() {
                         </div>
                     </Magnet>
                 </motion.div>
+
+                {/* Rotating Text Badge - Positioned at bottom right */}
+                <div className="absolute bottom-8 right-8 z-[100]">
+                    <Magnet 
+                        padding={5} 
+                        magnetStrength={4}
+                        wrapperClassName="cursor-target"
+                    >
+                        <div className="flex items-center gap-2.5 font-bold text-xl sm:text-2xl select-none">
+                            <span className="text-[#111] font-extrabold tracking-tight">Creative</span>
+                            <RotatingText
+                                texts={['developer!', 'problem solver!', 'learner!', 'builder!']}
+                                // mainClassName="px-4 py-1.5 bg-[#A855F7] text-white rounded-md overflow-hidden font-extrabold inline-flex items-center justify-center"
+                                mainClassName="bg-[#A855F7] text-white rounded-md"
+                                style={{
+                                    paddingLeft: "10px",
+                                    paddingRight: "10px",
+                                    paddingTop: "6px",
+                                    paddingBottom: "6px",
+                                }}
+                                staggerFrom={"first"}
+                                staggerDuration={0.025}
+                                rotationInterval={2500}
+                                transition={{ type: "spring", damping: 30, stiffness: 400 }}
+                            />
+                        </div>
+                    </Magnet>
+                </div>
             </motion.div>
         </>
     );
