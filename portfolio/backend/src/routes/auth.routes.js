@@ -5,11 +5,11 @@ const authController = require('../controllers/auth.controllers')
 const authMiddleware = require('../middlewares/auth.middleware')
 const upload = require('../middlewares/upload.middleware')
 
-router.post('/admin/register', authController.registerAdmin)
+// router.post('/admin/register', authController.registerAdmin)
 router.post('/admin/login', authController.loginAdmin)
 
 // profile routes
-router.get('/admin', authMiddleware.authAdminMiddleware, authController.getAdminProfile)
+router.get('/admin', authController.getAdminProfile)
 router.post(
   "/admin",
   authMiddleware.authAdminMiddleware,
