@@ -7,6 +7,7 @@ import Magnet from "./components/Magnet/Magnet";
 import RotatingText from "./components/RotatingText/RotatingText";
 import ContactModal from "./components/ContactModal/ContactModal";
 import AboutMe from "./components/AboutMe/AboutMe";
+import MyProjects from "./components/MyProjects/MyProjects";
 
 import avatarBW from "./assets/2D Vector Black&White.png";
 import avatarColor from "./assets/2D Vector Colored.png";
@@ -190,6 +191,9 @@ function App() {
 
                     {/* ABOUT ME SECTION */}
                     <AboutMe />
+
+                    {/* MY PROJECTS SECTION */}
+                    <MyProjects />
 
                     {/* Mouse-following Sequential message pop-up */}
                     <AnimatePresence>

@@ -17,7 +17,7 @@ export default function AboutMe() {
     };
 
     return (
-        <section className="w-full min-h-screen relative flex flex-col justify-start p-8 sm:p-16 overflow-hidden bg-[#0c0c0e] text-white select-none">
+        <section className="w-full h-screen relative flex flex-col justify-start p-8 sm:p-16 overflow-hidden bg-[#0c0c0e] text-white select-none">
             {/* Subtle white noise overlay for paper feel */}
             <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-white z-[1] filter url(#noiseFilter)" />
 
