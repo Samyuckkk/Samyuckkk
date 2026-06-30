@@ -8,6 +8,7 @@ import RotatingText from "./components/RotatingText/RotatingText";
 import ContactModal from "./components/ContactModal/ContactModal";
 import AboutMe from "./components/AboutMe/AboutMe";
 import MyProjects from "./components/MyProjects/MyProjects";
+import MyJourney from "./components/MyJourney/MyJourney";
 
 import avatarBW from "./assets/2D Vector Black&White.png";
 import avatarColor from "./assets/2D Vector Colored.png";
@@ -194,6 +195,9 @@ function App() {
 
                     {/* MY PROJECTS SECTION */}
                     <MyProjects />
+
+                    {/* MY JOURNEY SECTION */}
+                    <MyJourney />
 
                     {/* Mouse-following Sequential message pop-up */}
                     <AnimatePresence>

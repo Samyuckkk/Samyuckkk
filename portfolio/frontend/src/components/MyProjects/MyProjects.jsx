@@ -69,7 +69,7 @@ export default function MyProjects() {
             zIndex: 100,
           }}
         >
-          <h2 
+          <div 
             className="text-4xl sm:text-5xl tracking-tight text-white mb-3"
             style={{ 
               fontFamily: '"Gasoek One", sans-serif',
@@ -78,7 +78,7 @@ export default function MyProjects() {
             }}
           >
             My <span className="text-[#FFD500]">Projects</span>
-          </h2>
+          </div>
           <div className="w-12 h-1 bg-[#FFD500] mt-4 ml-auto rounded-full" />
         </div>
         <div 
@@ -122,7 +122,7 @@ export default function MyProjects() {
           zIndex: 100,
         }}
       >
-        <h1 
+        <div 
           className="text-4xl sm:text-5xl tracking-tight text-white mb-3"
           style={{ 
             fontFamily: '"Gasoek One", sans-serif',
@@ -133,7 +133,7 @@ export default function MyProjects() {
           }}
         >
           My <span className="text-[#FFD500]">Projects.</span>
-        </h1>
+        </div>
         {/* <div className="w-12 h-1 bg-[#FFD500] mt-4 ml-auto rounded-full" /> */}
       </div>
 
