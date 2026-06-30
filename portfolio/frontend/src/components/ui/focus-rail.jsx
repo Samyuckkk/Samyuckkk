@@ -47,9 +47,9 @@ export function FocusRail({
   const [isHovering, setIsHovering] = React.useState(false);
   const lastWheelTime = React.useRef(0);
 
-  const count = items.length;
-  const activeIndex = wrap(0, count, active);
-  const activeItem = items[activeIndex];
+  const count = items ? items.length : 0;
+  const activeIndex = count > 0 ? wrap(0, count, active) : 0;
+  const activeItem = count > 0 ? items[activeIndex] : null;
 
   // --- NAVIGATION HANDLERS ---
   const handlePrev = React.useCallback(() => {
@@ -154,7 +154,7 @@ export function FocusRail({
 
       {/* Main Stage */}
       <div className="relative z-10 flex flex-1 flex-col justify-center px-4 md:px-8"
-      style={{ transform: "translateY(-40px)" }}
+      style={{ transform: "translateY(-10px)" }}
       >
         {/* DRAGGABLE RAIL CONTAINER */}
         <motion.div
@@ -176,7 +176,7 @@ export function FocusRail({
             const dist = Math.abs(offset);
 
             // Dynamic transforms
-            const xOffset = offset * 320;
+            const xOffset = offset * 500;
             const zOffset = -dist * 180;
             const scale = isCenter ? 1 : 0.85;
             const rotateY = offset * -20;
@@ -189,7 +189,7 @@ export function FocusRail({
               <motion.div
                 key={absIndex}
                 className={cn(
-                  "absolute aspect-[3/4] w-[260px] md:w-[300px] rounded-2xl border-t border-white/20 bg-neutral-900 shadow-2xl transition-shadow duration-300",
+                  "absolute aspect-[4/3] w-[500px] md:w-[560px] rounded-2xl border-t border-white/20 bg-neutral-900 shadow-2xl transition-shadow duration-300",
                   isCenter ? "z-20 shadow-white/10" : "z-10"
                 )}
                 initial={false}
@@ -235,7 +235,8 @@ export function FocusRail({
         // marginTop: "80px",
     }}
 > */}
-        {/* Info & Controls */}
+
+
 {/* Info & Controls */}
 <div
   style={{
@@ -244,7 +245,7 @@ export function FocusRail({
     alignItems: "flex-end",
     width: "100%",
     marginTop: "80px",
-    paddingLeft: "120px",   // adjust if needed
+    paddingLeft: "80px",   // adjust if needed
     paddingRight: "120px",  // adjust if needed
   }}
 >
@@ -288,14 +289,23 @@ export function FocusRail({
     </motion.div>
   </AnimatePresence>
 
-  {/* RIGHT : CONTROLS */}
+  {/* centre : CONTROLS */}
   <div
+    // style={{
+    //   display: "flex",
+    //   alignItems: "center",
+    //   alignSelf: "flex-start",
+    //   marginTop: "40px",
+    //   transform: "translateX(-190px)",
+    // }}
     style={{
+      position: "absolute",
+      left: "52%",
+      top: "700px",          // adjust
+      transform: "translateX(-80px)",
       display: "flex",
       alignItems: "center",
-      alignSelf: "flex-start",
-      marginTop: "40px",
-    }}
+  }}
   >
     <div className="flex items-center gap-1 rounded-full bg-neutral-900/80 p-1 ring-1 ring-white/10 backdrop-blur-md">
       <button
@@ -318,6 +328,45 @@ export function FocusRail({
       </button>
     </div>
   </div>
+    {/* right : link buttons */}
+
+    <div className="flex items-center gap-3"
+        style={{
+      display: "flex",
+      alignItems: "center",
+      alignSelf: "flex-start",
+      marginTop: "40px",
+    }}
+    >
+      {/* GitHub Repository Link Button */}
+      {activeItem.github && (
+        <a
+          href={activeItem.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="cursor-none flex items-center justify-center w-11 h-11 rounded-full bg-neutral-900/80 border border-white/10 text-neutral-400 hover:text-white hover:bg-white/10 transition active:scale-95 shadow-md"
+          title="GitHub Repository"
+        >
+          <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+            <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z" />
+          </svg>
+        </a>
+      )}
+
+      {/* External live-link button using emoji */}
+      {activeItem.href && (
+        <a
+          href={activeItem.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="cursor-none flex items-center justify-center w-11 h-11 rounded-full bg-neutral-900/80 border border-white/10 text-neutral-400 hover:text-white hover:bg-white/10 transition active:scale-95 shadow-md text-base"
+          title="Live Demo"
+        >
+          🔗
+        </a>
+      )}
+    </div>
+
 </div>
       </div>
       </div>
