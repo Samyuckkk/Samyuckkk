@@ -153,7 +153,9 @@ export function FocusRail({
       </div>
 
       {/* Main Stage */}
-      <div className="relative z-10 flex flex-1 flex-col justify-center px-4 md:px-8">
+      <div className="relative z-10 flex flex-1 flex-col justify-center px-4 md:px-8"
+      style={{ transform: "translateY(-40px)" }}
+      >
         {/* DRAGGABLE RAIL CONTAINER */}
         <motion.div
           className="relative mx-auto flex h-[360px] w-full max-w-6xl items-center justify-center perspective-[1200px] cursor-grab active:cursor-grabbing"
@@ -223,61 +225,102 @@ export function FocusRail({
             );
           })}
         </motion.div>
-
+{/* <div
+    style={{
+        display: "flex",
+        alignItems: "flex-end",
+        justifyContent: "space-between",
+        width: "100%",      // adjust as needed
+        marginLeft: "2px", // same offset as the card
+        // marginTop: "80px",
+    }}
+> */}
         {/* Info & Controls */}
-        <div className="mx-auto mt-12 flex w-full max-w-2xl flex-col items-center justify-center gap-6 text-center pointer-events-auto"
-        style={{ marginTop: "80px",}}
+{/* Info & Controls */}
+<div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    width: "100%",
+    marginTop: "80px",
+    paddingLeft: "120px",   // adjust if needed
+    paddingRight: "120px",  // adjust if needed
+  }}
+>
+  {/* LEFT : INFO */}
+  <AnimatePresence mode="wait">
+    <motion.div
+      key={activeItem.id}
+      initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
+      transition={{ duration: 0.3 }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        textAlign: "left",
+        maxWidth: "500px",
+      }}
+    >
+      {activeItem.meta && (
+        <span
+          className="text-xs font-medium uppercase tracking-wider text-emerald-400"
+          style={{ marginBottom: "10px" }}
         >
-          <div className="flex flex-col items-center text-center h-32 justify-center">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeItem.id}
-                initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
-                transition={{ duration: 0.3 }}
-                className="space-y-2" 
-              >
-                {activeItem.meta && (
-                  <span className="text-xs font-medium uppercase tracking-wider text-emerald-400 block text-center" style={{ textAlign: "left", paddingBottom: "10px"}}>
-                    {activeItem.meta}
-                  </span>
-                )}
-                <h2 className="text-3xl font-bold tracking-tight md:text-4xl text-white text-center" style={{ textAlign: "left", paddingBottom: "10px"}}>
-                  {activeItem.title}
-                </h2>
-                {activeItem.description && (
-                  <p className="max-w-md text-neutral-400 text-center" style={{ textAlign: "left",}}>
-                    {activeItem.description}
-                  </p>
-                )}
-              </motion.div>
-            </AnimatePresence>
-          </div>
+          {activeItem.meta}
+        </span>
+      )}
 
-          <div className="flex items-center justify-center gap-4">
-            <div className="flex items-center gap-1 rounded-full bg-neutral-900/80 p-1 ring-1 ring-white/10 backdrop-blur-md">
-              <button
-                onClick={handlePrev}
-                className="rounded-full p-3 text-neutral-400 transition hover:bg-white/10 hover:text-white active:scale-95 cursor-none"
-                aria-label="Previous"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-              <span className="min-w-[40px] text-center text-xs font-mono text-neutral-500">
-                {activeIndex + 1} / {count}
-              </span>
-              <button
-                onClick={handleNext}
-                className="rounded-full p-3 text-neutral-400 transition hover:bg-white/10 hover:text-white active:scale-95 cursor-none"
-                aria-label="Next"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <h2
+        className="text-3xl font-bold tracking-tight md:text-4xl text-white"
+        style={{ marginBottom: "10px" }}
+      >
+        {activeItem.title}
+      </h2>
+
+      {activeItem.description && (
+        <p className="text-neutral-400">
+          {activeItem.description}
+        </p>
+      )}
+    </motion.div>
+  </AnimatePresence>
+
+  {/* RIGHT : CONTROLS */}
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      alignSelf: "flex-start",
+      marginTop: "40px",
+    }}
+  >
+    <div className="flex items-center gap-1 rounded-full bg-neutral-900/80 p-1 ring-1 ring-white/10 backdrop-blur-md">
+      <button
+        onClick={handlePrev}
+        className="rounded-full p-3 text-neutral-400 transition hover:bg-white/10 hover:text-white active:scale-95 cursor-none"
+        aria-label="Previous"
+      >
+        <ChevronLeft className="h-5 w-5" />
+      </button>
+
+      <span className="min-w-[40px] text-center text-xs font-mono text-neutral-500">
+        {activeIndex + 1} / {count}
+      </span>
+
+      <button onClick={handleNext}
+        className="rounded-full p-3 text-neutral-400 transition hover:bg-white/10 hover:text-white active:scale-95 cursor-none"
+        aria-label="Next"
+      >
+        <ChevronRight className="h-5 w-5" />
+      </button>
     </div>
+  </div>
+</div>
+      </div>
+      </div>
+    // </div>
   );
 }
