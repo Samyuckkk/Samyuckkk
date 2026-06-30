@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import Lenis from "lenis";
+import "lenis/dist/lenis.css";
 
 import Loader from "./components/Loader/Loader";
 import TargetCursor from "./components/TargetCursor/TargetCursor";
@@ -59,6 +61,53 @@ function App() {
 
         return () => clearTimeout(timer);
     }, []);
+
+    useEffect(() => {
+        if (loading) return;
+
+        // Initialize Lenis smooth scroll
+        // const lenis = new Lenis({
+        //     duration: 1.3, // slightly slower, very smooth and polished
+        //     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // smooth exponential easing
+        //     direction: 'vertical',
+        //     gestureDirection: 'vertical',
+        //     smooth: true,
+        //     mouseMultiplier: 0.9, // slightly dampened scroll speed for premium touch
+        //     smoothTouch: false, // native on mobile
+        //     touchMultiplier: 1.5,
+        //     infinite: false,
+        // });
+
+const lenis = new Lenis({
+  duration: 2.8,
+  easing: (t) => 1 - Math.pow(1 - t, 5),
+
+  // Make each wheel scroll move much less
+  mouseMultiplier: 0.35,
+
+  wheelMultiplier: 0.1,
+
+  // Touchpad
+  touchMultiplier: 0.8,
+
+  smoothWheel: true,
+  smoothTouch: false,
+  infinite: false,
+});
+
+        let rafId;
+        function raf(time) {
+            lenis.raf(time);
+            rafId = requestAnimationFrame(raf);
+        }
+
+        rafId = requestAnimationFrame(raf);
+
+        return () => {
+            lenis.destroy();
+            cancelAnimationFrame(rafId);
+        };
+    }, [loading]);
 
     return (
         <>

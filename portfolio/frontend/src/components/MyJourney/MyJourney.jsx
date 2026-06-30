@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { Briefcase, GraduationCap, Calendar } from "lucide-react";
+import Magnet from "../Magnet/Magnet";
 
 const BACKEND_URL = import.meta.env.BACKEND_URL || 'http://localhost:3000';
 
@@ -128,7 +129,11 @@ export default function MyJourney() {
   });
 
   return (
-    <section className="relative w-full min-h-screen bg-[#0c0c0e] py-28 px-4 md:px-12 flex flex-col items-center justify-center select-none overflow-hidden">
+    <section className="relative w-full min-h-screen bg-[#0c0c0e] py-28 px-4 md:px-12 flex flex-col items-center justify-start select-none overflow-hidden"
+    style={{
+      marginTop: "50px"
+    }}
+    >
       
       {/* Premium ambient backdrop glow */}
       <div className="absolute right-[-10%] bottom-[-10%] w-[350px] h-[350px] rounded-full bg-[#FFD500]/5 blur-[120px] pointer-events-none z-0" />
@@ -201,7 +206,12 @@ export default function MyJourney() {
                       viewport={{ once: true, margin: "-100px" }}
                       transition={{ duration: 0.6, ease: "easeOut" }}
                     >
-                      <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFD500]/10 border border-[#FFD500]/20 text-[#FFD500] text-xs font-mono">
+                      <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFD500]/10 border border-[#FFD500]/20 text-[#FFD500] text-xs font-mono"
+                      style={{
+                        borderRadius: "10px",
+  padding: "5px 15px",
+}}
+                      >
                         <Calendar className="w-3.5 h-3.5" />
                         {dateLabel}
                       </div>
@@ -209,13 +219,15 @@ export default function MyJourney() {
                   ) : (
                     /* Card on the Left side of line */
                     <motion.div 
-                      className="cursor-target"
+                      className="cursor-target w-full"
                       initial={{ opacity: 0, x: -30 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true, margin: "-100px" }}
                       transition={{ duration: 0.6, ease: "easeOut" }}
                     >
-                      <JourneyCard item={item} isRight={isRight} dateLabel={dateLabel} />
+                      <Magnet padding={5} magnetStrength={5} wrapperClassName="w-full" innerClassName="w-full">
+                        <JourneyCard item={item} isRight={isRight} dateLabel={dateLabel} />
+                      </Magnet>
                     </motion.div>
                   )}
                 </div>
@@ -230,7 +242,12 @@ export default function MyJourney() {
                       viewport={{ once: true, margin: "-100px" }}
                       transition={{ duration: 0.6, ease: "easeOut" }}
                     >
-                      <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFD500]/10 border border-[#FFD500]/20 text-[#FFD500] text-xs font-mono">
+                      <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFD500]/10 border border-[#FFD500]/20 text-[#FFD500] text-xs font-mono"
+                      style={{
+                        borderRadius: "10px",
+  padding: "5px 15px",
+}}
+                      >
                         <Calendar className="w-3.5 h-3.5" />
                         {dateLabel}
                       </div>
@@ -238,13 +255,15 @@ export default function MyJourney() {
                   ) : (
                     /* Card on the Right side of line */
                     <motion.div 
-                      className="cursor-target"
+                      className="cursor-target w-full"
                       initial={{ opacity: 0, x: 30 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true, margin: "-100px" }}
                       transition={{ duration: 0.6, ease: "easeOut" }}
                     >
-                      <JourneyCard item={item} isRight={isRight} dateLabel={dateLabel} />
+                      <Magnet padding={5} magnetStrength={5} wrapperClassName="w-full" innerClassName="w-full">
+                        <JourneyCard item={item} isRight={isRight} dateLabel={dateLabel} />
+                      </Magnet>
                     </motion.div>
                   )}
                 </div>
@@ -252,13 +271,15 @@ export default function MyJourney() {
                 {/* Mobile view (stacked, pl-12) */}
                 <div className="block md:hidden w-full pl-12 py-2">
                   <motion.div 
-                    className="cursor-target"
+                    className="cursor-target w-full"
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-100px" }}
                     transition={{ duration: 0.6, ease: "easeOut" }}
                   >
-                    <JourneyCard item={item} isRight={isRight} dateLabel={dateLabel} isMobile={true} />
+                    <Magnet disabled={true} wrapperClassName="w-full" innerClassName="w-full">
+                      <JourneyCard item={item} isRight={isRight} dateLabel={dateLabel} isMobile={true} />
+                    </Magnet>
                   </motion.div>
                 </div>
 
@@ -302,6 +323,11 @@ function JourneyCard({ item, dateLabel, isMobile = false }) {
 
         {/* Title & Company Stack */}
         <div className="flex flex-col">
+          {/* {item.technologies && item.technologies.length > 0 && (
+            <span className="text-xs font-medium uppercase tracking-wider text-emerald-400 mb-2 block text-left">
+              {item.technologies.join(" • ")}
+            </span>
+          )} */}
           <h3 
             className="text-white text-xl font-bold tracking-tight mb-1"
             style={{ fontFamily: "'Outfit', sans-serif" }}
@@ -325,19 +351,16 @@ function JourneyCard({ item, dateLabel, isMobile = false }) {
         {item.description}
       </p>
 
-      {/* Technologies Badges */}
       {item.technologies && item.technologies.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-4 justify-start">
-          {item.technologies.map((tech, tIdx) => (
-            <span 
-              key={tIdx} 
-              className="px-2.5 py-1 text-xs font-mono rounded-md bg-zinc-800/40 border border-zinc-700/50 text-[#FFD500]/90"
+            <span className="text-xs font-medium uppercase tracking-wider text-emerald-400 mb-2 block text-left"
+            style={{
+              marginTop: "10px"
+            }}
             >
-              {tech}
+              {item.technologies.join(" • ")}
             </span>
-          ))}
-        </div>
-      )}
+          )}
+
     </div>
   );
 }

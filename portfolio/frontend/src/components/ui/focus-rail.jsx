@@ -368,7 +368,7 @@ export function FocusRail({
           target="_blank"
           rel="noopener noreferrer"
           className="cursor-none flex items-center justify-center w-11 h-11 rounded-full bg-neutral-900/80 border border-white/10 text-neutral-400 hover:text-white hover:bg-white/10 transition active:scale-95 shadow-md"
-          onMouseEnter={() => handleTooltipMouseEnter("Peek Behind the Code!")}
+          onMouseEnter={() => handleTooltipMouseEnter("Don't Judge My Commits 👀")}
           onMouseLeave={handleTooltipMouseLeave}
           onMouseMove={handleTooltipMouseMove}
         >
