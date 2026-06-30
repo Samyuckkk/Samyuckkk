@@ -125,7 +125,7 @@ export default function AboutMe() {
                 <div 
                     className="w-full lg:w-[850px] flex flex-col items-center lg:items-end lg:pt-24 self-center lg:self-start gap-10"
                     style={{ 
-                        marginTop: "60px"
+                        marginTop: "50px"
                     }}
                 >
                     {/* Tilted Card Wrapper - Fixed Width aligned to Right */}
@@ -165,7 +165,7 @@ export default function AboutMe() {
                     <div 
                         className="w-full lg:w-[850px] max-w-full self-center lg:self-end"
                         style={{ 
-                            marginTop: "5px",     // Move down
+                            marginTop: "-15px",     // Move down
                         }}
                     >
                         <BorderGlow
