@@ -185,9 +185,9 @@ export default function AboutMe() {
                             padding: "20px 50px"
 
                                         }}>
-                                    <h3 className="text-2xl font-bold tracking-tight text-white font-outfit">
+                                    <div className="text-2xl font-bold tracking-tight text-white font-outfit">
                                         My <span className="text-[#FFD500]">Strengths</span>
-                                    </h3>
+                                    </div>
                                     {/* <div className="w-12 h-1 bg-white mt-3 rounded-full" /> */}
                                 </div>
 
