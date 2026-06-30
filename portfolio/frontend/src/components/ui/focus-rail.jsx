@@ -62,9 +62,24 @@ export function FocusRail({
     setTooltipText(null);
   }, []);
 
+  const [hoveredIndex, setHoveredIndex] = React.useState(null);
+
   const count = items ? items.length : 0;
   const activeIndex = count > 0 ? wrap(0, count, active) : 0;
   const activeItem = count > 0 ? items[activeIndex] : null;
+
+  const isHoveringCenterCard = hoveredIndex === activeIndex;
+
+  React.useEffect(() => {
+    if (isHoveringCenterCard) {
+      window.lenis?.stop();
+    } else {
+      window.lenis?.start();
+    }
+    return () => {
+      window.lenis?.start();
+    };
+  }, [isHoveringCenterCard]);
 
   // --- NAVIGATION HANDLERS ---
   const handlePrev = React.useCallback(() => {
@@ -226,6 +241,8 @@ export function FocusRail({
                 onClick={() => {
                   if (offset !== 0) setActive((p) => p + offset);
                 }}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
               >
                 <img
                   src={item.imageSrc}

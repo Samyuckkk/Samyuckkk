@@ -79,13 +79,13 @@ function App() {
         // });
 
 const lenis = new Lenis({
-  duration: 2.8,
+  duration: 2.2,
   easing: (t) => 1 - Math.pow(1 - t, 5),
 
   // Make each wheel scroll move much less
-  mouseMultiplier: 0.35,
+  mouseMultiplier: 0.5,
 
-  wheelMultiplier: 0.1,
+  wheelMultiplier: 0.8,
 
   // Touchpad
   touchMultiplier: 0.8,
@@ -94,6 +94,8 @@ const lenis = new Lenis({
   smoothTouch: false,
   infinite: false,
 });
+
+        window.lenis = lenis;
 
         let rafId;
         function raf(time) {
@@ -105,6 +107,7 @@ const lenis = new Lenis({
 
         return () => {
             lenis.destroy();
+            window.lenis = undefined;
             cancelAnimationFrame(rafId);
         };
     }, [loading]);
