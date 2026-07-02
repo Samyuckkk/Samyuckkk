@@ -19,7 +19,7 @@
 <p align="center">I'm a Computer Science student who loves turning ideas into real-world applications. I enjoy building scalable backend systems, AI-powered solutions, and full-stack web applications. When I'm not coding, you'll probably find me solving DSA problems, participating in hackathons, or adding "just one more feature" to a side project.</p>
 
 ###
-
+<!-- LinkedIN -->
 <div align="center">
   <a href="https://www.linkedin.com/in/samyakoholkar" target="_blank">
     <img src="https://img.shields.io/static/v1?message=LinkedIn&logo=linkedin&label=&color=0077B5&logoColor=white&labelColor=&style=for-the-badge" height="35" alt="linkedin logo"  />
