@@ -159,6 +159,7 @@ export default function AboutMe() {
     }}
 >
                         <TiltedCard
+                            className="cursor-target"
                             imageSrc="https://ik.imagekit.io/samyuck/Portfolio/Profile/1d3c930c-b2cb-49a1-a5c5-f5583904a834_1BCCcaBZg"
                             altText="Samyak Oholkar - Profile Image"
                             captionText="Samyak Oholkar"
