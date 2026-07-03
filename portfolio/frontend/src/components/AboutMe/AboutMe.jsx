@@ -1,4 +1,4 @@
-
+import { useState, useEffect } from "react";
 import Magnet from "../Magnet/Magnet";
 import { Case } from "../ui/cases-with-infinite-scroll";
 import SpotlightCard from "../SpotlightCard/SpotlightCard";
@@ -8,110 +8,133 @@ import BorderGlow from "../BorderGlow/BorderGlow";
 /**
  * AboutMe Component - Dark themed section with a large Anton SC display heading,
  * biography paragraph, customized magnetized download button, calligraphic signature,
- * and a side-aligned premium TiltedCard profile image layout.
+ * and two decoupled, independent vertical column layouts.
  */
 export default function AboutMe() {
+    const [isMobile, setIsMobile] = useState(false);
+    const [leftPadding, setLeftPadding] = useState(0);
+    useEffect(() => {
+        const handleResize = () => {
+    const w = window.innerWidth;
+
+    setIsMobile(w < 640);
+
+    if (w >= 1536) setLeftPadding(80);
+    else if (w >= 1280) setLeftPadding(60);
+    else if (w >= 1024) setLeftPadding(40);
+    else if (w >= 768) setLeftPadding(20);
+    else setLeftPadding(0);
+};
+        handleResize();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
     const handleDownload = () => {
         const resumeUrl = "https://ik.imagekit.io/samyuck/Portfolio/Resume/43693d67-c95c-4b61-9cc0-18e0117c4c5b_XAHx3fUoC";
         window.open(resumeUrl, '_blank');
     };
 
     return (
-        <section className="w-full h-screen relative flex flex-col justify-start p-8 sm:p-16 overflow-hidden bg-[#0c0c0e] text-white select-none">
+        <section className="w-full min-h-[auto] relative flex flex-col justify-center py-16 sm:py-24 overflow-hidden bg-[#0c0c0e] text-white select-none px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
             {/* Subtle white noise overlay for paper feel */}
             <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-white z-[1] filter url(#noiseFilter)" />
 
-            {/* Content container - two column layout on large screens */}
-            <div className="relative z-10 w-full max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-start gap-12 lg:gap-16">
+            {/* Content container - grid layout on desktop, stacked on mobile */}
+            {/* <div className="relative z-10 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-28 xl:gap-36"> */}
+            {/* <div className="relative z-10 w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-0"> */}
+            <div
+    className="relative z-10 w-full mx-auto grid grid-cols-1 gap-12 lg:gap-0"
+    style={{
+        gridTemplateColumns:
+            window.innerWidth >= 1536 ? "46% 54%" :
+            window.innerWidth >= 1280 ? "46% 54%" :
+            window.innerWidth >= 1024 ? "46% 54%" :
+            "1fr"
+    }}
+>
                 
-                {/* Left Column (Content details) */}
-                <div className="flex-1 flex flex-col justify-start w-full">
-                    {/* Large stylish heading on top left - styled as div to avoid cursor snap brackets */}
-                    <div 
-                        className="text-6xl sm:text-8xl text-amber-500 tracking-tight"
-                        style={{ 
-                            fontFamily: '"Anton SC", sans-serif',
-                            fontWeight: 400,
-                            fontStyle: 'normal',
-                            marginTop: "50px",
-                            marginLeft: "50px"
-                        }}
-                    >
-                        About Me.
-                    </div>
-
-                    {/* About Me bio paragraph - constrained to left side of screen */}
-                    <p 
-                        className="text-lg sm:text-xl text-zinc-300 leading-relaxed max-w-xl sm:max-w-2xl font-outfit"
-                        style={{ 
-                            marginTop: "40px",
-                            marginLeft: "55px",
-                            fontWeight: 300
-                        }}
-                    >
-                        I build modern web applications, solve real-world problems, and occasionally spend way too long looking for a missing semicolon. I enjoy turning ideas into products that are fast, intuitive, and actually fun to use. When I'm not coding, I'm probably solving LeetCode problems, exploring new technologies, participating in hackathons, or explaining to Git why I totally meant to push from the wrong branch.
-                    </p>
-
-                    {/* Resume Download CTA & Handwritten Signature Block */}
-                    <div 
-                        className="flex flex-row items-center gap-10 sm:gap-14 flex-wrap"
-                        style={{ 
-                            marginTop: "45px",
-                            marginLeft: "55px"
-                        }}
-                    >
-                        {/* Magnet-wrapped Download Button */}
-                        <Magnet 
-                            padding={12} 
-                            magnetStrength={4}
-                            wrapperClassName="cursor-target"
-                        >
-                            <button 
-                                onClick={handleDownload}
-                                className="flex items-center gap-3.5 bg-[#111115] border-1 border-[#FFD500] text-[#FFD500] hover:bg-[#FFD500] hover:text-[#111115] font-bold py-4 px-9 rounded-full shadow-lg transition-all duration-300 transform active:scale-95 cursor-none text-base sm:text-lg select-none"
-                                style={{
-                                    fontFamily: "'Outfit', sans-serif",
-                                    padding: "10px 20px",
-                                    borderRadius: "25px"
-                                }}
-                            >
-                                <span>Download Resume</span>
-                                <svg 
-                                    className="w-5.5 h-5.5 stroke-current" 
-                                    fill="none" 
-                                    viewBox="0 0 24 24" 
-                                    stroke="currentColor" 
-                                    strokeWidth="2.5"
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                </svg>
-                            </button>
-                        </Magnet>
-
-                        {/* Styled Handwriting Signature next to button */}
+                {/* LEFT COLUMN: About Me Content + Tech Stack Card */}
+                <div
+    className="flex flex-col gap-12 lg:gap-16"
+    style={{
+    width: isMobile ? "100%" : "90%",
+    marginLeft: isMobile ? "0px" : "30px",
+    marginTop: isMobile ? "0px" : "30px"
+}}
+>
+                    {/* About Me Text Content Block */}
+                    <div className="flex flex-col gap-6 md:gap-8 w-full">
+                        {/* Large stylish heading - styled as div to avoid cursor snap brackets */}
                         <div 
-                            className="text-amber-500/85 tracking-widest select-none pointer-events-none text-5xl sm:text-6xl"
+                            className="text-5xl sm:text-6xl md:text-8xl text-amber-500 tracking-tight"
                             style={{ 
-                                fontFamily: '"Mrs Saint Delafield", cursive',
+                                fontFamily: '"Anton SC", sans-serif',
                                 fontWeight: 400,
-                                fontStyle: 'normal',
-                                transform: "rotate(-9deg)",
-                                fontSize: "42px",
-                                marginLeft: "50px"
+                                fontStyle: 'normal'
                             }}
                         >
-                            Samyak Oholkar
+                            About Me.
+                        </div>
+
+                        {/* About Me bio paragraph */}
+                        <p 
+                            className="text-base sm:text-lg md:text-xl text-zinc-300 leading-relaxed font-outfit"
+                            style={{ 
+                                fontWeight: 300
+                            }}
+                        >
+                            I build modern web applications, solve real-world problems, and occasionally spend way too long looking for a missing semicolon. I enjoy turning ideas into products that are fast, intuitive, and actually fun to use. When I'm not coding, I'm probably solving LeetCode problems, exploring new technologies, participating in hackathons, or explaining to Git why I totally meant to push from the wrong branch.
+                        </p>
+
+                        {/* Resume Download CTA & Handwritten Signature Block */}
+                        <div className="flex flex-row items-center gap-10 sm:gap-14 flex-wrap mt-2">
+                            {/* Magnet-wrapped Download Button */}
+                            <Magnet 
+                                padding={12} 
+                                magnetStrength={4}
+                                wrapperClassName="cursor-target"
+                            >
+                                <button 
+                                    onClick={handleDownload}
+                                    className="flex items-center gap-3.5 bg-[#111115] border-1 border-[#FFD500] text-[#FFD500] hover:bg-[#FFD500] hover:text-[#111115] font-bold py-4 px-9 rounded-full shadow-lg transition-all duration-300 transform active:scale-95 cursor-none text-base sm:text-lg select-none"
+                                    style={{
+                                        fontFamily: "'Outfit', sans-serif",
+                                        padding: "10px 20px",
+                                        borderRadius: "25px"
+                                    }}
+                                >
+                                    <span>Download Resume</span>
+                                    <svg 
+                                        className="w-5.5 h-5.5 stroke-current" 
+                                        fill="none" 
+                                        viewBox="0 0 24 24" 
+                                        stroke="currentColor" 
+                                        strokeWidth="2.5"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                </button>
+                            </Magnet>
+
+                            {/* Styled Handwriting Signature next to button */}
+                            <div 
+                                className="text-amber-500/85 tracking-widest select-none pointer-events-none text-5xl sm:text-6xl"
+                                style={{ 
+                                    fontFamily: '"Mrs Saint Delafield", cursive',
+                                    fontWeight: 400,
+                                    fontStyle: 'normal',
+                                    transform: "rotate(-9deg)",
+                                    fontSize: "42px"
+                                }}
+                            >
+                                Samyak Oholkar
+                            </div>
                         </div>
                     </div>
 
-                    {/* Tech Stack Infinite Carousel inside Spotlight Card - aligned left in line with the bio text */}
-                    <div 
-                        className="max-w-xl sm:max-w-2xl w-full"
-                        style={{ 
-                            marginTop: "80px",
-                            marginLeft: "55px" 
-                        }}
-                    >
+                    {/* Tech Stack Spotlight Card */}
+                    <div className="w-full">
                         <SpotlightCard 
                             className="w-full bg-[#111115]/50 border-zinc-800/80 shadow-2xl"
                             spotlightColor="rgba(255, 213, 0, 0.15)"
@@ -121,33 +144,37 @@ export default function AboutMe() {
                     </div>
                 </div>
 
-                {/* Right Column (Profile details - stacked vertically) */}
-                <div 
-                    className="w-full lg:w-[850px] flex flex-col items-center lg:items-end lg:pt-24 self-center lg:self-start gap-10"
-                    style={{ 
-                        marginTop: "50px"
-                    }}
-                >
-                    {/* Tilted Card Wrapper - Fixed Width aligned to Right */}
+                {/* RIGHT COLUMN: Profile Image + My Strengths Card */}
+                {/* <div className="flex flex-col items-center gap-12 lg:gap-16 w-full"> */}
+                <div className="flex flex-col items-center gap-6 sm:gap-8 lg:gap-16 w-full">
+                {/* <div className="flex flex-col items-center lg:items-start gap-12 lg:gap-16 w-full"> */}
+                    {/* Centered Profile Image Card */}
+                    {/* <div className="w-[350px] max-w-full cursor-target flex justify-center" style={{
+                        marginTop: "30px"
+                    }}> */}
                     <div
-    className="w-[350px] self-center lg:self-start cursor-target"
-    style={{ marginLeft: "250px" }}
+    className="w-full flex justify-center"
+    style={{
+        marginTop: isMobile ? "10px" : "30px"
+    }}
 >
                         <TiltedCard
                             imageSrc="https://ik.imagekit.io/samyuck/Portfolio/Profile/1d3c930c-b2cb-49a1-a5c5-f5583904a834_1BCCcaBZg"
                             altText="Samyak Oholkar - Profile Image"
                             captionText="Samyak Oholkar"
-                            containerHeight="400px"
-                            containerWidth="350px"
-                            imageHeight="350px"
-                            imageWidth="320px"
+                            containerHeight={isMobile ? "320px" : "400px"}
+                            containerWidth={isMobile ? "280px" : "350px"}
+                            imageHeight={isMobile ? "290px" : "350px"}
+                            imageWidth={isMobile ? "260px" : "320px"}
                             rotateAmplitude={12}
                             scaleOnHover={1.12}
                             showMobileWarning={false}
                             showTooltip={true}
                             displayOverlayContent={true}
                             overlayContent={
-                                <div className="relative w-[320px] h-[350px] pointer-events-none select-none">
+                                <div className="relative pointer-events-none select-none"
+                                    style={{ width: isMobile ? "260px" : "320px", height: isMobile ? "290px" : "350px" }}
+                                >
                                     <div className="absolute top-[20px] left-6 bg-[#6b7280]/90 backdrop-blur-sm text-white font-serif text-lg py-3 px-6 rounded-2xl shadow-lg border border-white/10 whitespace-nowrap"
                                         style={{
                                             borderRadius: "10px",
@@ -161,12 +188,17 @@ export default function AboutMe() {
                         />
                     </div>
 
-                    {/* Border Glow Stats/Status Card - Independent Width aligned to Right */}
-                    <div 
-                        className="w-full lg:w-[850px] max-w-full self-center lg:self-end"
-                        style={{ 
-                            marginTop: "-15px",     // Move down
-                        }}
+                    {/* Centered My Strengths Card stretching to fill right column width */}
+                    <div className="w-full max-w-3xl"
+                    style={{
+        transform: isMobile
+    ? "none"
+    : window.innerWidth >= 1536
+        ? "translateY(-50px)"
+        : window.innerWidth >= 1280
+            ? "translateY(-40px)"
+            : "translateY(-30px)"
+    }}
                     >
                         <BorderGlow
                             edgeSensitivity={30}
@@ -179,25 +211,24 @@ export default function AboutMe() {
                             animated={true}
                             colors={['#FFD500', '#FFAA00', '#FF8C00']}
                         >
-                            <div className="p-8 sm:p-10 font-outfit select-none text-left w-full">
+                            <div className="p-6 sm:p-8 font-outfit select-none text-left w-full flex flex-col justify-between"
+                            style={{
+                                padding: "20px"
+                            }}
+                            >
                                 {/* Header */}
-                                <div className="mb-8" style={{
-                            padding: "20px 50px"
-
-                                        }}>
-                                    <div className="text-2xl font-bold tracking-tight text-white font-outfit">
+                                <div className="mb-6">
+                                    <div className="text-2xl font-bold tracking-tight text-white font-outfit"
+                                    style={{
+                                        paddingBottom: "20px"
+                                    }}
+                                    >
                                         My <span className="text-[#FFD500]">Strengths</span>
                                     </div>
-                                    {/* <div className="w-12 h-1 bg-white mt-3 rounded-full" /> */}
                                 </div>
 
                                 {/* Responsive Grid */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-5"
-                                        style={{
-                            padding: "25px 50px",
-                            paddingBottom: "10px" 
-                                        }}
-                                >
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6">
                                     
                                     {/* Problem Solving */}
                                     <div className="group flex items-start gap-4 transition-all duration-300 hover:-translate-y-1 p-2 rounded-xl hover:bg-zinc-800/10">

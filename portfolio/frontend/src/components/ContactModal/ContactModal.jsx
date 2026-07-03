@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { submitContactForm } from '../../api/contact';
 
@@ -13,6 +13,16 @@ export default function ContactModal({ isOpen, onClose }) {
         phone: '',
         message: ''
     });
+
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 640);
+        };
+        handleResize();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     const [status, setStatus] = useState('idle'); // 'idle' | 'submitting' | 'success' | 'error'
     const [errorMsg, setErrorMsg] = useState('');
@@ -111,7 +121,7 @@ export default function ContactModal({ isOpen, onClose }) {
                             // className="bg-white/20 backdrop-blur-2xl text-[#111] w-full max-w-lg border border-white/20 rounded-[10px] p-12 shadow-2xl relative pointer-events-auto select-none"
                             className="bg-white/20 backdrop-blur-2xl text-[#111] w-full max-w-lg border border-white/20 rounded-[20px] shadow-2xl relative pointer-events-auto select-none"
     style={{
-        padding: "48px 50px 40px 50px"
+        padding: isMobile ? "24px 20px" : "48px 50px 40px 50px"
     }}
                             initial={{ scale: 0.9, opacity: 0, y: 30 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}

@@ -145,7 +145,7 @@ export default function MyJourney() {
     marginBottom: "20px",
   }}>
         <div 
-          className="text-4xl sm:text-5xl font-bold tracking-widest text-white mb-4 uppercase"
+          className="text-2xl sm:text-4xl md:text-5xl font-bold tracking-widest text-white mb-4 uppercase"
           style={{ 
             fontFamily: "'Syncopate', sans-serif",
             letterSpacing: "0.15em"
