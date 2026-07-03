@@ -123,22 +123,20 @@ function Case() {
         <div className="flex flex-col gap-6">
           {/* Header styled as div to bypass target cursor snap triggers */}
           <div 
-            className="text-2xl sm:text-3xl tracking-tight text-left font-outfit text-zinc-300 select-none"
+            className="text-2xl sm:text-3xl tracking-tight text-left font-outfit text-zinc-300 select-none px-6 sm:px-8"
             style={{ 
               fontWeight: 400
             }}
           >
             My Tech Stack & Expertise
           </div>
-          <div className="w-full relative">
+          <div className="w-full relative px-6 sm:px-8">
             <Carousel setApi={setApi} className="w-full" opts={{ loop: true, dragFree: true }}>
               <CarouselContent>
                 {technologies.map((tech, index) => (
-                  <CarouselItem className="basis-1/3 sm:basis-1/4 pl-4" key={index}>
-                    <div className="flex flex-col items-center justify-center p-5 rounded-xl bg-white/5 border border-zinc-800/50 aspect-video hover:bg-white/10 hover:border-[#FFD500]/30 hover:scale-105 transition-all duration-300 shadow-md"
+                  <CarouselItem className="basis-1/2 xs:basis-1/3 sm:basis-1/4 pl-4" key={index}>
+                    <div className="flex flex-col items-center justify-center p-5 rounded-xl bg-white/5 border border-zinc-800/50 aspect-video hover:bg-white/10 hover:border-[#FFD500]/30 hover:scale-105 transition-all duration-300 shadow-md w-full max-w-[120px] mx-auto"
                     style={{
-        width: "120px",
-        // height: "120px",
         padding: "20px",
         marginTop: "20px"
     }}

@@ -197,7 +197,7 @@ const lenis = new Lenis({
                         </motion.div>
 
                         {/* Rotating Text Badge - Positioned at bottom right */}
-                        <div className="absolute bottom-8 right-8 z-[100] flex items-center gap-2.5 font-bold text-xl sm:text-2xl select-none">
+                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 sm:right-8 sm:left-auto sm:translate-x-0 sm:bottom-8 z-[100] flex items-center gap-2.5 font-bold text-xl sm:text-2xl select-none w-max">
                             <span className="text-[#111] font-extrabold tracking-tight">Creative</span>
                             <Magnet 
                                 padding={5} 
@@ -222,7 +222,7 @@ const lenis = new Lenis({
                         </div>
 
                         {/* Contact Me Button - Positioned at top left */}
-                        <div className="absolute top-10 left-10 z-[100]">
+                        <div className="absolute top-6 left-1/2 -translate-x-1/2 sm:left-10 sm:translate-x-0 sm:top-10 z-[100]">
                             <Magnet 
                                 padding={15} 
                                 magnetStrength={5}

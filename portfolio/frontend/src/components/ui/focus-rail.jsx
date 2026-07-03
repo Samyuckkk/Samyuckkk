@@ -63,6 +63,28 @@ export function FocusRail({
   }, []);
 
   const [hoveredIndex, setHoveredIndex] = React.useState(null);
+  const [windowWidth, setWindowWidth] = React.useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const isMobile = windowWidth < 768;
+  const isTablet = windowWidth >= 768 && windowWidth < 1024;
+
+  const getCardWidth = () => {
+    if (windowWidth < 480) return 280;
+    if (windowWidth < 640) return 320;
+    if (windowWidth < 768) return 400;
+    if (windowWidth < 1024) return 480;
+    return 560;
+  };
+
+  const cardWidth = getCardWidth();
 
   const count = items ? items.length : 0;
   const activeIndex = count > 0 ? wrap(0, count, active) : 0;
@@ -99,35 +121,41 @@ export function FocusRail({
       // Debounce: prevent rapid firing from inertia scrolling (400ms lockout)
       if (now - lastWheelTime.current < 400) return;
 
-      // Detect horizontal scroll primarily, but also fallback to vertical if shift is held
-      const isHorizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY);
-      const delta = isHorizontal ? e.deltaX : e.deltaY;
+      const deltaY = e.deltaY;
+      const threshold = 15; // sensitivity threshold
 
-      // Threshold to avoid accidental micro-scrolls
-      if (Math.abs(delta) > 20) {
-        if (delta > 0) {
+      if (Math.abs(deltaY) > threshold) {
+        lastWheelTime.current = now;
+        if (deltaY > 0) {
           handleNext();
         } else {
           handlePrev();
         }
-        lastWheelTime.current = now;
       }
     },
     [handleNext, handlePrev]
   );
 
-  // Autoplay logic
+  // --- KEYBOARD LOGIC ---
+  const onKeyDown = React.useCallback(
+    (e) => {
+      if (e.key === "ArrowLeft") {
+        handlePrev();
+      } else if (e.key === "ArrowRight") {
+        handleNext();
+      }
+    },
+    [handlePrev, handleNext]
+  );
+
+  // --- AUTOPLAY LOGIC ---
   React.useEffect(() => {
     if (!autoPlay || isHovering) return;
-    const timer = setInterval(() => handleNext(), interval);
+    const timer = setInterval(() => {
+      handleNext();
+    }, interval);
     return () => clearInterval(timer);
-  }, [autoPlay, isHovering, handleNext, interval]);
-
-  // Keyboard navigation
-  const onKeyDown = (e) => {
-    if (e.key === "ArrowLeft") handlePrev();
-    if (e.key === "ArrowRight") handleNext();
-  };
+  }, [autoPlay, isHovering, interval, handleNext]);
 
   // --- SWIPE / DRAG LOGIC ---
   const swipeConfidenceThreshold = 10000;
@@ -184,12 +212,16 @@ export function FocusRail({
 
       {/* Main Stage */}
       <div className="relative z-10 flex flex-1 flex-col justify-center px-4 md:px-8"
-      style={{ transform: "translateY(-10px)" }}
+        style={{ transform: "translateY(-10px)" }}
       >
         {/* DRAGGABLE RAIL CONTAINER */}
         <motion.div
-          className="relative mx-auto flex h-[360px] w-full max-w-6xl items-center justify-center perspective-[1200px] cursor-grab active:cursor-grabbing"
-          style={{ marginLeft: "265px", marginTop: "150px" }}
+          className="relative mx-auto flex w-full max-w-6xl items-center justify-center perspective-[1200px] cursor-grab active:cursor-grabbing"
+          style={{ 
+            marginLeft: isMobile ? "0px" : "265px", 
+            marginTop: isMobile ? "100px" : "150px", 
+            height: isMobile ? "240px" : "360px" 
+          }}
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.2}
@@ -205,8 +237,8 @@ export function FocusRail({
             const isCenter = offset === 0;
             const dist = Math.abs(offset);
 
-            // Dynamic transforms
-            const xOffset = offset * 500;
+            // Dynamic transforms scaled by dynamic cardWidth
+            const xOffset = offset * (cardWidth + 20);
             const zOffset = -dist * 180;
             const scale = isCenter ? 1 : 0.85;
             const rotateY = offset * -20;
@@ -219,7 +251,7 @@ export function FocusRail({
               <motion.div
                 key={absIndex}
                 className={cn(
-                  "absolute aspect-[4/3] w-[500px] md:w-[560px] rounded-2xl border-t border-white/20 bg-neutral-900 shadow-2xl transition-shadow duration-300",
+                  "absolute aspect-[4/3] rounded-2xl border-t border-white/20 bg-neutral-900 shadow-2xl transition-shadow duration-300",
                   isCenter ? "z-20 shadow-white/10" : "z-10"
                 )}
                 initial={false}
@@ -237,6 +269,7 @@ export function FocusRail({
                 }}
                 style={{
                   transformStyle: "preserve-3d",
+                  width: cardWidth,
                 }}
                 onClick={() => {
                   if (offset !== 0) setActive((p) => p + offset);
@@ -257,187 +290,177 @@ export function FocusRail({
             );
           })}
         </motion.div>
-{/* <div
-    style={{
-        display: "flex",
-        alignItems: "flex-end",
-        justifyContent: "space-between",
-        width: "100%",      // adjust as needed
-        marginLeft: "2px", // same offset as the card
-        // marginTop: "80px",
-    }}
-> */}
 
-
-{/* Info & Controls */}
-<div
-  style={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-    width: "100%",
-    marginTop: "80px",
-    paddingLeft: "80px",   // adjust if needed
-    paddingRight: "120px",  // adjust if needed
-  }}
->
-  {/* LEFT : INFO */}
-  <AnimatePresence mode="wait">
-    <motion.div
-      key={activeItem.id}
-      initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
-      transition={{ duration: 0.3 }}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-start",
-        textAlign: "left",
-        maxWidth: "500px",
-      }}
-    >
-      {activeItem.meta && (
-        <span
-          className="text-xs font-medium uppercase tracking-wider text-emerald-400"
-          style={{ marginBottom: "10px" }}
+        {/* Info & Controls Wrapper */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: isMobile ? "column" : "row",
+            justifyContent: "space-between",
+            alignItems: isMobile ? "center" : "flex-end",
+            width: "100%",
+            marginTop: isMobile ? "40px" : "80px",
+            paddingLeft: isMobile ? "20px" : "80px",
+            paddingRight: isMobile ? "20px" : "120px",
+            gap: isMobile ? "24px" : "0px",
+          }}
         >
-          {activeItem.meta}
-        </span>
-      )}
+          {/* LEFT : INFO */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeItem.id}
+              initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
+              transition={{ duration: 0.3 }}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: isMobile ? "center" : "flex-start",
+                textAlign: isMobile ? "center" : "left",
+                maxWidth: "500px",
+                width: "100%",
+              }}
+            >
+              {activeItem.meta && (
+                <span
+                  className="text-xs font-medium uppercase tracking-wider text-emerald-400"
+                  style={{ marginBottom: "10px" }}
+                >
+                  {activeItem.meta}
+                </span>
+              )}
 
-      <h2
-        className="text-3xl font-bold tracking-tight md:text-4xl text-white"
-        style={{ marginBottom: "10px" }}
-      >
-        {activeItem.title}
-      </h2>
+              <h2
+                className="text-3xl font-bold tracking-tight md:text-4xl text-white"
+                style={{ marginBottom: "10px" }}
+              >
+                {activeItem.title}
+              </h2>
 
-      {activeItem.description && (
-        <p className="text-neutral-400">
-          {activeItem.description}
-        </p>
-      )}
-    </motion.div>
-  </AnimatePresence>
+              {activeItem.description && (
+                <p className="text-neutral-400">
+                  {activeItem.description}
+                </p>
+              )}
+            </motion.div>
+          </AnimatePresence>
 
-  {/* centre : CONTROLS */}
-  <div
-    // style={{
-    //   display: "flex",
-    //   alignItems: "center",
-    //   alignSelf: "flex-start",
-    //   marginTop: "40px",
-    //   transform: "translateX(-190px)",
-    // }}
-    style={{
-      position: "absolute",
-      left: "52%",
-      top: "700px",          // adjust
-      transform: "translateX(-80px)",
-      display: "flex",
-      alignItems: "center",
-  }}
-  >
-    <div className="flex items-center gap-1 rounded-full bg-neutral-900/80 p-1 ring-1 ring-white/10 backdrop-blur-md">
-      <button
-        onClick={handlePrev}
-        className="rounded-full p-3 text-neutral-400 transition hover:bg-white/10 hover:text-white active:scale-95 cursor-none"
-        aria-label="Previous"
-      >
-        <ChevronLeft className="h-5 w-5" />
-      </button>
-
-      <span className="min-w-[40px] text-center text-xs font-mono text-neutral-500">
-        {activeIndex + 1} / {count}
-      </span>
-
-      <button onClick={handleNext}
-        className="rounded-full p-3 text-neutral-400 transition hover:bg-white/10 hover:text-white active:scale-95 cursor-none"
-        aria-label="Next"
-      >
-        <ChevronRight className="h-5 w-5" />
-      </button>
-    </div>
-  </div>
-    {/* right : link buttons */}
-
-    <div className="flex items-center gap-3"
-    //   style={{
-    //   display: "flex",
-    //   alignItems: "center",
-    //   alignSelf: "flex-start",
-    //   marginTop: "40px",
-    // }}
-      style={{
-      position: "absolute",
-      left: "85%",
-      top: "700px",          // adjust
-      transform: "translateX(-80px)",
-      display: "flex",
-      alignItems: "center",
-      }}
-    >
-      {/* GitHub Repository Link Button */}
-      {activeItem.github && (
-        <a
-          href={activeItem.github}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="cursor-none flex items-center justify-center w-11 h-11 rounded-full bg-neutral-900/80 border border-white/10 text-neutral-400 hover:text-white hover:bg-white/10 transition active:scale-95 shadow-md"
-          onMouseEnter={() => handleTooltipMouseEnter("Don't Judge My Commits 👀")}
-          onMouseLeave={handleTooltipMouseLeave}
-          onMouseMove={handleTooltipMouseMove}
-        >
-          <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-            <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z" />
-          </svg>
-        </a>
-      )}
-
-      {/* External live-link button using emoji */}
-      {activeItem.href && (
-        <a
-          href={activeItem.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="cursor-none flex items-center justify-center w-11 h-11 rounded-full bg-neutral-900/80 border border-white/10 text-neutral-400 hover:text-white hover:bg-white/10 transition active:scale-95 shadow-md text-base"
-          onMouseEnter={() => handleTooltipMouseEnter("See More...")}
-          onMouseLeave={handleTooltipMouseLeave}
-          onMouseMove={handleTooltipMouseMove}
-        >
-          🔗
-        </a>
-      )}
-    </div>
-
-</div>
-      <AnimatePresence>
-        {tooltipText && (
-          <div 
-            style={{
-              position: 'fixed',
-              left: tooltipPos.x,
-              top: tooltipPos.y,
-              transform: 'translate(20px, -50%)',
-              pointerEvents: 'none',
-              zIndex: 9999,
+          {/* centre : CONTROLS */}
+          <div
+            style={isMobile ? {
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: "10px",
+              width: "100%",
+            } : {
+              position: "absolute",
+              left: "52%",
+              top: "700px",
+              transform: "translateX(-80px)",
+              display: "flex",
+              alignItems: "center",
             }}
           >
-            <motion.div 
-              className="avatar-message-pop font-outfit"
-              initial={{ opacity: 0, scale: 0.8, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.8, y: 10 }}
-              transition={{ type: 'spring', damping: 15, stiffness: 200 }}
-            >
-              {tooltipText}
-            </motion.div>
+            <div className="flex items-center gap-1 rounded-full bg-neutral-900/80 p-1 ring-1 ring-white/10 backdrop-blur-md">
+              <button
+                onClick={handlePrev}
+                className="rounded-full p-3 text-neutral-400 transition hover:bg-white/10 hover:text-white active:scale-95 cursor-none"
+                aria-label="Previous"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+
+              <span className="min-w-[40px] text-center text-xs font-mono text-neutral-500">
+                {activeIndex + 1} / {count}
+              </span>
+
+              <button onClick={handleNext}
+                className="rounded-full p-3 text-neutral-400 transition hover:bg-white/10 hover:text-white active:scale-95 cursor-none"
+                aria-label="Next"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+
+          {/* right : link buttons */}
+          <div className="flex items-center gap-3"
+            style={isMobile ? {
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: "10px",
+              width: "100%",
+            } : {
+              position: "absolute",
+              left: "85%",
+              top: "700px",
+              transform: "translateX(-80px)",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            {/* GitHub Repository Link Button */}
+            {activeItem.github && (
+              <a
+                href={activeItem.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="cursor-none flex items-center justify-center w-11 h-11 rounded-full bg-neutral-900/80 border border-white/10 text-neutral-400 hover:text-white hover:bg-white/10 transition active:scale-95 shadow-md"
+                onMouseEnter={() => handleTooltipMouseEnter("Peek Behind the Code!")}
+                onMouseLeave={handleTooltipMouseLeave}
+                onMouseMove={handleTooltipMouseMove}
+              >
+                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                  <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z" />
+                </svg>
+              </a>
+            )}
+
+            {/* External live-link button using emoji */}
+            {activeItem.href && (
+              <a
+                href={activeItem.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="cursor-none flex items-center justify-center w-11 h-11 rounded-full bg-neutral-900/80 border border-white/10 text-neutral-400 hover:text-white hover:bg-white/10 transition active:scale-95 shadow-md text-base"
+                onMouseEnter={() => handleTooltipMouseEnter("See More...")}
+                onMouseLeave={handleTooltipMouseLeave}
+                onMouseMove={handleTooltipMouseMove}
+              >
+                🔗
+              </a>
+            )}
+          </div>
+        </div>
+
+        <AnimatePresence>
+          {tooltipText && (
+            <div 
+              style={{
+                position: 'fixed',
+                left: tooltipPos.x,
+                top: tooltipPos.y,
+                transform: 'translate(20px, -50%)',
+                pointerEvents: 'none',
+                zIndex: 9999,
+              }}
+            >
+              <motion.div 
+                className="avatar-message-pop font-outfit"
+                initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.8, y: 10 }}
+                transition={{ type: 'spring', damping: 15, stiffness: 200 }}
+              >
+                {tooltipText}
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
       </div>
-      </div>
-    // </div>
+    </div>
   );
 }

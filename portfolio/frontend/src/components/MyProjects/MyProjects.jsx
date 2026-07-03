@@ -9,6 +9,16 @@ export default function MyProjects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -117,7 +127,7 @@ export default function MyProjects() {
         className="text-right pr-4 md:pr-[120px]"
         style={{
           position: "absolute",
-          top: "40px",
+          top: isMobile ? "20px" : "40px",
           right: "0",
           zIndex: 100,
         }}
@@ -127,9 +137,9 @@ export default function MyProjects() {
           style={{ 
             fontFamily: '"Gasoek One", sans-serif',
             fontWeight: 400,
-            fontSize: "68px",
+            fontSize: isMobile ? "36px" : "68px",
             fontStyle: 'normal',
-            marginRight:"40px"
+            marginRight: isMobile ? "10px" : "40px"
           }}
         >
           My <span className="text-[#FFD500]">Projects.</span>
