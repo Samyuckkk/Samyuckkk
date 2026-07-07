@@ -151,9 +151,9 @@ export default function CinematicAbout() {
                 </motion.h2>
 
                 {/* Staged Content Wrapper (revealed beneath the title at z-[5]) */}
-                {/* Changed top alignment to top-start layout to eliminate vertical empty spacing */}
+                {/* Aligned top to start at the header's top to support top-edge column alignment */}
                 <div 
-                    className="absolute top-[110px] sm:top-[150px] lg:top-[210px] bottom-6 left-6 right-6 sm:left-10 sm:right-10 md:left-16 md:right-16 lg:left-24 lg:right-24 xl:left-[120px] xl:right-[120px] flex items-start justify-start  z-[5] pointer-events-auto"
+                    className="absolute top-[156px] sm:top-[50px] lg:top-[60px] bottom-6 left-6 right-6 sm:left-10 sm:right-10 md:left-16 md:right-16 lg:left-24 lg:right-16 xl:left-[120px] xl:right-[80px] flex items-start justify-start overflow-y-auto z-[5] pointer-events-auto"
                     style={{ scrollbarWidth: "none", msOverflowStyle: "none" }} // Hide scrollbar for a cleaner premium feel
                 >
                     <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1.3fr_0.9fr] gap-12 lg:gap-20 xl:gap-24 items-center py-4">
@@ -161,63 +161,69 @@ export default function CinematicAbout() {
                         {/* LEFT COLUMN: Animated Bio Paragraph + Magnet Download Button */}
                         <motion.div
                             style={{ opacity: bioOpacity, y: bioY }}
-                            className="flex flex-col items-start gap-8 md:gap-10 w-full"
+                            className="flex flex-col items-start gap-16 sm:gap-20 lg:gap-24 w-full"
                         >
-                            <p 
-                                className="text-base sm:text-lg md:text-xl text-zinc-300 leading-relaxed font-outfit"
-                                style={{
-                                    fontSize: 20, 
-                                    fontWeight: 300
-                                }}
-                            >
-                                I build modern web applications, solve real-world problems, and occasionally spend way too long looking for a missing semicolon. I enjoy turning ideas into products that are fast, intuitive, and actually fun to use. When I'm not coding, I'm probably solving LeetCode problems, exploring new technologies, participating in hackathons, or explaining to Git why I totally meant to push from the wrong branch.
-                            </p>
+                            {/* Responsive spacer to clear the space reserved for the header */}
+                            <div className="hidden sm:block sm:h-[60px] lg:hidden" />
+                            <div className="hidden lg:block lg:h-[96px]" />
 
-                            {/* Download Resume Magnet Button Block */}
-                            <div className="flex flex-row items-center gap-10 sm:gap-14 flex-wrap mt-2">
-                                <Magnet 
-                                    padding={12} 
-                                    magnetStrength={4}
-                                    wrapperClassName="cursor-target"
+                            {/* Sub-container holding biography text and resume button with explicit gaps */}
+                            <div className="flex flex-col items-start gap-8 md:gap-10 w-full">
+                                <p 
+                                    className="text-base sm:text-lg md:text-xl text-zinc-300 leading-relaxed font-outfit"
+                                    style={{ 
+                                        fontWeight: 300
+                                    }}
                                 >
-                                    <button 
-                                        onClick={handleDownload}
-                                        className="flex items-center gap-3.5 bg-[#111115] border-1 border-[#FFD500] text-[#FFD500] hover:bg-[#FFD500] hover:text-[#111115] font-bold py-4 px-9 rounded-full shadow-lg transition-all duration-300 transform active:scale-95 cursor-none text-base sm:text-lg select-none"
-                                        style={{
-                                            fontFamily: "'Outfit', sans-serif",
-                                            padding: "10px 20px",
-                                            borderRadius: "25px"
-                                        }}
+                                    I build modern web applications, solve real-world problems, and occasionally spend way too long looking for a missing semicolon. I enjoy turning ideas into products that are fast, intuitive, and actually fun to use. When I'm not coding, I'm probably solving LeetCode problems, exploring new technologies, participating in hackathons, or explaining to Git why I totally meant to push from the wrong branch.
+                                </p>
+
+                                {/* Download Resume Magnet Button Block */}
+                                <div className="flex flex-row items-center gap-10 sm:gap-14 flex-wrap mt-2">
+                                    <Magnet 
+                                        padding={12} 
+                                        magnetStrength={4}
+                                        wrapperClassName="cursor-target"
                                     >
-                                        <span>Download Resume</span>
-                                        <svg 
-                                            className="w-5.5 h-5.5 stroke-current" 
-                                            fill="none" 
-                                            viewBox="0 0 24 24" 
-                                            stroke="currentColor" 
-                                            strokeWidth="2.5"
+                                        <button 
+                                            onClick={handleDownload}
+                                            className="flex items-center gap-3.5 bg-[#111115] border-1 border-[#FFD500] text-[#FFD500] hover:bg-[#FFD500] hover:text-[#111115] font-bold py-4 px-9 rounded-full shadow-lg transition-all duration-300 transform active:scale-95 cursor-none text-base sm:text-lg select-none"
+                                            style={{
+                                                fontFamily: "'Outfit', sans-serif",
+                                                padding: "10px 20px",
+                                                borderRadius: "25px"
+                                            }}
                                         >
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                        </svg>
-                                    </button>
-                                </Magnet>
+                                            <span>Download Resume</span>
+                                            <svg 
+                                                className="w-5.5 h-5.5 stroke-current" 
+                                                fill="none" 
+                                                viewBox="0 0 24 24" 
+                                                stroke="currentColor" 
+                                                strokeWidth="2.5"
+                                            >
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                            </svg>
+                                        </button>
+                                    </Magnet>
+                                </div>
                             </div>
                         </motion.div>
 
                         {/* RIGHT COLUMN: Animated Tilted Card Wrapper */}
                         <motion.div
                             style={{ opacity: cardOpacity, y: cardY }}
-                            className="w-full flex justify-center items-center"
+                            className="w-full flex justify-center lg:justify-end items-center"
                         >
                             <TiltedCard
                                 className="cursor-target"
                                 imageSrc="https://ik.imagekit.io/samyuck/Portfolio/Profile/1d3c930c-b2cb-49a1-a5c5-f5583904a834_1BCCcaBZg"
                                 altText="Samyak Oholkar - Profile Image"
                                 captionText="Samyak Oholkar"
-                                containerHeight={isMobile ? "320px" : "400px"}
-                                containerWidth={isMobile ? "280px" : "350px"}
-                                imageHeight={isMobile ? "290px" : "350px"}
-                                imageWidth={isMobile ? "260px" : "320px"}
+                                containerHeight={isMobile ? "320px" : "450px"}
+                                containerWidth={isMobile ? "280px" : "390px"}
+                                imageHeight={isMobile ? "290px" : "390px"}
+                                imageWidth={isMobile ? "260px" : "360px"}
                                 rotateAmplitude={12}
                                 scaleOnHover={1.12}
                                 showMobileWarning={false}
@@ -225,7 +231,7 @@ export default function CinematicAbout() {
                                 displayOverlayContent={true}
                                 overlayContent={
                                     <div className="relative pointer-events-none select-none"
-                                        style={{ width: isMobile ? "260px" : "320px", height: isMobile ? "290px" : "350px" }}
+                                        style={{ width: isMobile ? "260px" : "360px", height: isMobile ? "290px" : "390px" }}
                                     >
                                         <div className="absolute top-[20px] left-6 bg-[#6b7280]/90 backdrop-blur-sm text-white font-serif text-lg py-3 px-6 rounded-2xl shadow-lg border border-white/10 whitespace-nowrap"
                                             style={{
