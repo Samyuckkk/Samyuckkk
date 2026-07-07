@@ -10,6 +10,7 @@ router.post('/admin/login', authController.loginAdmin)
 
 // profile routes
 router.get('/admin', authController.getAdminProfile)
+
 router.post(
   "/admin",
   authMiddleware.authAdminMiddleware,
@@ -19,5 +20,6 @@ router.post(
   ]),
   authController.updateAdminProfile,
 );
+
 
 module.exports = router
