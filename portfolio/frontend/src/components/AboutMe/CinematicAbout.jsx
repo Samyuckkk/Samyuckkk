@@ -2,6 +2,40 @@ import { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform, useSpring, useMotionTemplate } from "framer-motion";
 import TiltedCard from "../TiltedCard/TiltedCard";
 import Magnet from "../Magnet/Magnet";
+import LogoLoop from "../LogoLoop/LogoLoop";
+import { 
+    SiReact, 
+    SiNextdotjs, 
+    SiTypescript, 
+    SiTailwindcss, 
+    SiNodedotjs, 
+    SiMongodb, 
+    SiPython, 
+    SiDocker, 
+    SiPostgresql, 
+    SiGit,
+    SiFastapi,
+    SiDjango,
+    SiTensorflow,
+    SiPytorch
+} from 'react-icons/si';
+
+const techLogos = [
+    { node: <SiReact />, title: "React", href: "https://react.dev" },
+    { node: <SiNextdotjs />, title: "Next.js", href: "https://nextjs.org" },
+    { node: <SiTypescript />, title: "TypeScript", href: "https://www.typescriptlang.org" },
+    { node: <SiTailwindcss />, title: "Tailwind CSS", href: "https://tailwindcss.com" },
+    { node: <SiNodedotjs />, title: "Node.js", href: "https://nodejs.org" },
+    { node: <SiMongodb />, title: "MongoDB", href: "https://www.mongodb.com" },
+    { node: <SiPython />, title: "Python", href: "https://www.python.org" },
+    { node: <SiDocker />, title: "Docker", href: "https://www.docker.com" },
+    { node: <SiPostgresql />, title: "PostgreSQL", href: "https://www.postgresql.org" },
+    { node: <SiGit />, title: "Git", href: "https://git-scm.com" },
+    { node: <SiFastapi />, title: "FastAPI", href: "https://fastapi.tiangolo.com" },
+    { node: <SiDjango />, title: "Django", href: "https://www.djangoproject.com" },
+    { node: <SiTensorflow />, title: "TensorFlow", href: "https://www.tensorflow.org" },
+    { node: <SiPytorch />, title: "PyTorch", href: "https://pytorch.org" }
+];
 
 /**
  * CinematicAbout Component
@@ -112,6 +146,10 @@ export default function CinematicAbout() {
     const cardOpacity = useTransform(smoothProgress, [0.85, 0.98], [0, 1]);
     const cardY = useTransform(smoothProgress, [0.85, 0.98], [30, 0]);
 
+    // Logo loop fades in and slides up at the end of the scroll narrative
+    const logoOpacity = useTransform(smoothProgress, [0.88, 0.99], [0, 1]);
+    const logoY = useTransform(smoothProgress, [0.88, 0.99], [20, 0]);
+
     // Background color and noise texture blending transforms
     const bgColor = useTransform(smoothProgress, [0.45, 0.85], ["#000000", "#0c0c0e"]);
     const noiseOpacity = useTransform(smoothProgress, [0.45, 0.85], [0, 0.02]);
@@ -153,7 +191,7 @@ export default function CinematicAbout() {
                 {/* Staged Content Wrapper (revealed beneath the title at z-[5]) */}
                 {/* Aligned top to start at the header's top to support top-edge column alignment */}
                 <div 
-                    className="absolute top-[156px] sm:top-[50px] lg:top-[60px] bottom-6 left-6 right-6 sm:left-10 sm:right-10 md:left-16 md:right-16 lg:left-24 lg:right-16 xl:left-[120px] xl:right-[80px] flex items-start justify-start overflow-y-auto z-[5] pointer-events-auto"
+                    className="absolute top-[156px] sm:top-[50px] lg:top-[60px] bottom-6 left-6 right-6 sm:left-10 sm:right-10 md:left-16 md:right-16 lg:left-24 lg:right-16 xl:left-[120px] xl:right-[80px] flex flex-col z-[5] pointer-events-auto"
                     style={{ scrollbarWidth: "none", msOverflowStyle: "none" }} // Hide scrollbar for a cleaner premium feel
                 >
                     <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1.3fr_0.9fr] gap-12 lg:gap-20 xl:gap-24 items-center py-4">
@@ -246,6 +284,29 @@ export default function CinematicAbout() {
                             />
                         </motion.div>
                     </div>
+
+                    {/* Dedicated Layout Spacer (120-180px vertical breathing room) */}
+                    <div className="h-32 lg:h-36 xl:h-38 shrink-0" />
+
+                    {/* LogoLoop Container (integrated clean marquee strip breaking out full width) */}
+                    <motion.div 
+                        style={{ opacity: logoOpacity, y: logoY }}
+                        className="w-full -mx-6 sm:-mx-10 md:-mx-16 lg:-ml-24 lg:-mr-16 xl:-ml-[120px] xl:-mr-[80px] px-12 sm:px-14 lg:px-16 xl:px-[120px] pb-10"
+                    >
+                        <LogoLoop
+                            logos={techLogos}
+                            speed={60}
+                            direction="left"
+                            logoHeight={isMobile ? 36 : isTablet ? 46 : 54}
+                            gap={isMobile ? 40 : isTablet ? 60 : 80}
+                            hoverSpeed={0}
+                            scaleOnHover
+                            fadeOut
+                            fadeOutColor="#0c0c0e"
+                            ariaLabel="Technology stack"
+                        />
+                    </motion.div>
+
                 </div>
 
             </motion.div>
