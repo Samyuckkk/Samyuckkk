@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Briefcase, GraduationCap, Calendar } from "lucide-react";
 import Magnet from "../Magnet/Magnet";
 
-const BACKEND_URL = import.meta.env.BACKEND_URL || 'http://localhost:3000';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 
 const formatDate = (dateStr) => {
   if (!dateStr) return "";

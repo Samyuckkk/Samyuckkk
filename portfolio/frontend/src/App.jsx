@@ -31,6 +31,41 @@ function App() {
     const [isContactModalOpen, setIsContactModalOpen] = useState(false);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
+    const [links, setLinks] = useState({
+        github: 'github.com/Samyuckkk',
+        linkedin: 'linkedin.com/in/samyakoholkar',
+        leetcode: 'leetcode.com/u/Samyuckkk/'
+    });
+
+    const formatUrl = (url) => {
+        if (!url) return '';
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            return url;
+        }
+        return `https://${url}`;
+    };
+
+    useEffect(() => {
+        const fetchAdminLinks = async () => {
+            try {
+                const baseUrl = (import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000').replace(/\/$/, '');
+                const response = await fetch(`${baseUrl}/auth/admin`);
+                const data = await response.json();
+                if (data.success && data.admin && data.admin.length > 0) {
+                    const adminData = data.admin[0];
+                    setLinks({
+                        github: adminData.github || 'github.com/Samyuckkk',
+                        linkedin: adminData.linkedin || 'linkedin.com/in/samyakoholkar',
+                        leetcode: adminData.leetcode || 'leetcode.com/u/Samyuckkk/'
+                    });
+                }
+            } catch (err) {
+                console.error("Error fetching admin links:", err);
+            }
+        };
+        fetchAdminLinks();
+    }, []);
+
 
 
     const handleMouseEnter = () => {
@@ -238,6 +273,55 @@ const lenis = new Lenis({
                                 >
                                     Contact Me
                                 </button>
+                            </Magnet>
+                        </div>
+
+                        {/* GitHub, LinkedIn, LeetCode Links - Positioned at top right */}
+                        <div className="absolute top-6 right-6 sm:right-10 sm:top-10 z-[100] flex items-center gap-4 sm:gap-8 pointer-events-auto">
+                            <Magnet 
+                                padding={12} 
+                                magnetStrength={5}
+                                wrapperClassName="cursor-target"
+                            >
+                                <a
+                                    href={formatUrl(links.github)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-xs sm:text-base text-[#111] bg-transparent font-bold tracking-wider uppercase select-none cursor-none hover:opacity-75 transition-opacity"
+                                    style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}
+                                >
+                                    GitHub
+                                </a>
+                            </Magnet>
+                            <Magnet 
+                                padding={12} 
+                                magnetStrength={5}
+                                wrapperClassName="cursor-target"
+                            >
+                                <a
+                                    href={formatUrl(links.linkedin)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-xs sm:text-base text-[#111] bg-transparent font-bold tracking-wider uppercase select-none cursor-none hover:opacity-75 transition-opacity"
+                                    style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}
+                                >
+                                    LinkedIn
+                                </a>
+                            </Magnet>
+                            <Magnet 
+                                padding={12} 
+                                magnetStrength={5}
+                                wrapperClassName="cursor-target"
+                            >
+                                <a
+                                    href={formatUrl(links.leetcode)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-xs sm:text-base text-[#111] bg-transparent font-bold tracking-wider uppercase select-none cursor-none hover:opacity-75 transition-opacity"
+                                    style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}
+                                >
+                                    LeetCode
+                                </a>
                             </Magnet>
                         </div>
                     </div>
