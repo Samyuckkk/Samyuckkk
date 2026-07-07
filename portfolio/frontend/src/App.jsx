@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import Lenis from "lenis";
 import "lenis/dist/lenis.css";
 
@@ -9,6 +9,7 @@ import Magnet from "./components/Magnet/Magnet";
 import RotatingText from "./components/RotatingText/RotatingText";
 import ContactModal from "./components/ContactModal/ContactModal";
 import AboutMe from "./components/AboutMe/AboutMe";
+import CinematicAbout from "./components/AboutMe/CinematicAbout";
 import MyProjects from "./components/MyProjects/MyProjects";
 import MyJourney from "./components/MyJourney/MyJourney";
 
@@ -30,6 +31,13 @@ function App() {
     const [isContactHovered, setIsContactHovered] = useState(false);
     const [isContactModalOpen, setIsContactModalOpen] = useState(false);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+    const heroRef = useRef(null);
+    const { scrollYProgress: heroScroll } = useScroll({
+        target: heroRef,
+        offset: ["start start", "end start"]
+    });
+    const heroBgOpacity = useTransform(heroScroll, [0, 0.85], [0, 1]);
 
     const [links, setLinks] = useState({
         github: 'github.com/Samyuckkk',
@@ -114,16 +122,16 @@ function App() {
         // });
 
 const lenis = new Lenis({
-  duration: 2.2,
+  duration: 1,
   easing: (t) => 1 - Math.pow(1 - t, 5),
 
   // Make each wheel scroll move much less
-  mouseMultiplier: 0.5,
+  mouseMultiplier: 1,
 
-  wheelMultiplier: 0.8,
+  wheelMultiplier: 1,
 
   // Touchpad
-  touchMultiplier: 0.8,
+  touchMultiplier: 1,
 
   smoothWheel: true,
   smoothTouch: false,
@@ -175,11 +183,17 @@ const lenis = new Lenis({
             </AnimatePresence>
 
             {!loading ? (
-                <div className="relative w-full overflow-x-hidden">
+                <div className="relative w-full">
                     {/* HERO SECTION */}
-                    <div className="hero flex-col gap-6 w-full min-h-screen relative overflow-hidden">
+                    <div ref={heroRef} className="hero flex-col gap-6 w-full min-h-screen relative overflow-hidden">
                         {/* Noise overlay */}
                         <div className="hero-noise" />
+
+                        {/* Black transition overlay */}
+                        <motion.div 
+                            className="absolute inset-0 bg-black pointer-events-none z-[99]"
+                            style={{ opacity: heroBgOpacity }}
+                        />
 
                         {/* Hero Content Wrapper (Foreground) */}
                         <motion.div 
@@ -325,6 +339,9 @@ const lenis = new Lenis({
                             </Magnet>
                         </div>
                     </div>
+
+                    {/* CINEMATIC ABOUT ME SECTION */}
+                    <CinematicAbout />
 
                     {/* ABOUT ME SECTION */}
                     <AboutMe />
