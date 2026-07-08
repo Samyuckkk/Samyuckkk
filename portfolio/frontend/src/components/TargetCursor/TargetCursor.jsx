@@ -29,7 +29,7 @@ const getContainingBlockOffset = block => {
 };
 
 const TargetCursor = ({
-  targetSelector = 'a, button, [role="button"], h1, h2, h3, h4, .cursor-target',
+  targetSelector = 'a, button, [role="button"], h1:not(.no-cursor-target), h2:not(.no-cursor-target), h3:not(.no-cursor-target), h4:not(.no-cursor-target), .cursor-target',
   spinDuration = 2,
   hideDefaultCursor = true,
   hoverDuration = 0.2,

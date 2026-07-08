@@ -170,7 +170,7 @@ export default function CinematicAbout() {
                 {/* Staged motion.h2 heading (rendered above background at z-[10]) */}
                 <motion.h2
                     ref={titleRef}
-                    className="font-extrabold uppercase tracking-tight whitespace-nowrap cursor-target select-none"
+                    className="font-extrabold uppercase tracking-tight whitespace-nowrap no-cursor-target select-none"
                     style={{
                         position: "absolute",
                         left: "50%",

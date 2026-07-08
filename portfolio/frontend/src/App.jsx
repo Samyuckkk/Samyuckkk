@@ -344,7 +344,7 @@ const lenis = new Lenis({
                     <CinematicAbout />
 
                     {/* ABOUT ME SECTION */}
-                    <AboutMe />
+                    {/* <AboutMe /> */}
 
                     {/* MY PROJECTS SECTION */}
                     <MyProjects />
