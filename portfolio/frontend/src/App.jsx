@@ -8,8 +8,8 @@ import TargetCursor from "./components/TargetCursor/TargetCursor";
 import Magnet from "./components/Magnet/Magnet";
 import RotatingText from "./components/RotatingText/RotatingText";
 import ContactModal from "./components/ContactModal/ContactModal";
-import AboutMe from "./components/AboutMe/AboutMe";
 import CinematicAbout from "./components/AboutMe/CinematicAbout";
+import AboutLoader from "./components/AboutMe/AboutLoader";
 import MyProjects from "./components/MyProjects/MyProjects";
 import MyJourney from "./components/MyJourney/MyJourney";
 
@@ -20,6 +20,8 @@ import "./index.css";
 
 function App() {
     const [loading, setLoading] = useState(true);
+    const [loaderPlayed, setLoaderPlayed] = useState(false);
+    const [showLoader, setShowLoader] = useState(false);
 
     const messages = [
         "Hire me before someone else does!",
@@ -155,6 +157,46 @@ const lenis = new Lenis({
         };
     }, [loading]);
 
+    useEffect(() => {
+        if (loading) return;
+
+        // If the page is already scrolled past Hero, consider loader as played
+        if (window.scrollY > 100) {
+            setLoaderPlayed(true);
+            return;
+        }
+
+        const handleScroll = () => {
+            if (window.scrollY > 20 && !loaderPlayed && !showLoader) {
+                setShowLoader(true);
+            }
+        };
+
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [loading, loaderPlayed, showLoader]);
+
+    // Lock scrolling when loader is active
+    useEffect(() => {
+        if (showLoader) {
+            if (window.lenis) window.lenis.stop();
+            document.body.style.overflow = "hidden";
+            document.documentElement.style.overflow = "hidden";
+        }
+    }, [showLoader]);
+
+    // Called by AboutLoader only after its exit animation has fully completed
+    const handleLoaderScrollReady = () => {
+        setShowLoader(false);
+        setLoaderPlayed(true);
+        document.body.style.overflow = "";
+        document.documentElement.style.overflow = "";
+        // Start Lenis after a single frame so it picks up the already-set scrollTop
+        requestAnimationFrame(() => {
+            if (window.lenis) window.lenis.start();
+        });
+    };
+
     return (
         <>
             {/* SVG Noise Filter for Paper/Analog Texture */}
@@ -181,6 +223,8 @@ const lenis = new Lenis({
             <AnimatePresence>
                 {loading && <Loader key="loader" />}
             </AnimatePresence>
+
+            {showLoader && <AboutLoader key="about-loader" onScrollReady={handleLoaderScrollReady} />}
 
             {!loading ? (
                 <div className="relative w-full">
@@ -340,11 +384,8 @@ const lenis = new Lenis({
                         </div>
                     </div>
 
-                    {/* CINEMATIC ABOUT ME SECTION */}
-                    <CinematicAbout />
-
                     {/* ABOUT ME SECTION */}
-                    {/* <AboutMe /> */}
+                    <CinematicAbout />
 
                     {/* MY PROJECTS SECTION */}
                     <MyProjects />

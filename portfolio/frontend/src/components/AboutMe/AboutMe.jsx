@@ -36,7 +36,7 @@ export default function AboutMe() {
     };
 
     return (
-        <section className="w-full min-h-[auto] relative flex flex-col justify-center py-16 sm:py-24 overflow-hidden bg-[#0c0c0e] text-white select-none px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
+        <section id="about-me" className="w-full min-h-[auto] relative flex flex-col justify-center py-16 sm:py-24 overflow-hidden bg-[#0c0c0e] text-white select-none px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
             {/* Subtle white noise overlay for paper feel */}
             <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-white z-[1] filter url(#noiseFilter)" />
 
