@@ -1,6 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Anton+SC&family=Asset&family=Badeen+Display&family=Chango&family=Climate+Crisis&family=Mrs+Saint+Delafield&family=Sacramento&family=Spicy+Rice&family=Syncopate:wght@700&display=swap');
 @import "tailwindcss";
 
+@font-face {
+    font-family: 'Rockybilly';
+    src: url('./assets/fonts/Rockybilly.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+.font-projects-heading {
+    font-family: 'Rockybilly', sans-serif !important;
+}
+
 *{
     margin:0;
     padding:0;
@@ -12,6 +24,16 @@ body{
     overflow-y: auto;
     background-color: #0c0c0e;
     font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+/* Hide scrollbar globally — Chrome, Edge, Safari */
+::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar — Firefox */
+* {
+    scrollbar-width: none;
 }
 
 .hero{
@@ -135,4 +157,13 @@ body{
     text-align: center;
     pointer-events: none;
     font-family: 'Outfit', sans-serif;
+}
+
+/* Custom Cursor Blinking Animation for AboutLoader */
+@keyframes cursor-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+.animate-cursor-blink {
+    animation: cursor-blink 0.8s step-end infinite;
 }

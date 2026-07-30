@@ -80,10 +80,10 @@ export default function MyProjects() {
           }}
         >
           <div 
-            className="text-4xl sm:text-5xl tracking-tight text-white mb-3"
+            className="text-4xl sm:text-5xl tracking-tight text-white mb-3 font-projects-heading"
             style={{ 
-              fontFamily: '"Gasoek One", sans-serif',
               fontWeight: 400,
+              fontSize: isMobile ? "26px" : "50px",
               fontStyle: 'normal'
             }}
           >
@@ -127,17 +127,16 @@ export default function MyProjects() {
         className="text-right pr-4 md:pr-[120px]"
         style={{
           position: "absolute",
-          top: isMobile ? "20px" : "40px",
+          top: isMobile ? "60px" : "80px",
           right: "0",
           zIndex: 100,
         }}
       >
         <div 
-          className="text-4xl sm:text-5xl tracking-tight text-white mb-3"
+          className="text-4xl sm:text-5xl tracking-tight text-white mb-3 font-projects-heading"
           style={{ 
-            fontFamily: '"Gasoek One", sans-serif',
             fontWeight: 400,
-            fontSize: isMobile ? "36px" : "68px",
+            fontSize: isMobile ? "22px" : "44px",
             fontStyle: 'normal',
             marginRight: isMobile ? "10px" : "40px"
           }}
