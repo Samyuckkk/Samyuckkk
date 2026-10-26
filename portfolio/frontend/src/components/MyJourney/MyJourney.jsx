@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import axios from "axios";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -105,6 +106,7 @@ export default function MyJourney() {
   const [experiences, setExperiences] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [mobileHeaderVisible, setMobileHeaderVisible] = useState(false);
 
   const sectionRef = useRef(null);
   const trackRef = useRef(null);
@@ -130,14 +132,36 @@ export default function MyJourney() {
       .finally(() => setLoading(false));
   }, []);
 
-  /* scroll animation */
+  /* mobile fixed header — shown once section top reaches viewport top */
+  useEffect(() => {
+    if (typeof window === "undefined" || window.innerWidth >= 768) return;
+
+    const update = () => {
+      const rect = sectionRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      // Fixed header takes over once section top hits viewport top; hides after section leaves
+      setMobileHeaderVisible(rect.top <= 0 && rect.bottom > 0);
+    };
+
+    window.addEventListener("scroll", update, { passive: true });
+    const lenis = window.lenis;
+    if (lenis) lenis.on("scroll", update);
+    update();
+
+    return () => {
+      window.removeEventListener("scroll", update);
+      if (lenis) lenis.off("scroll", update);
+    };
+  }, [experiences]);
+
+  /* scroll animation — desktop only */
   useEffect(() => {
     if (prefersReducedMotion) return;
     if (!trackRef.current || !sectionRef.current) return;
     if (experiences.length === 0) return;
+    if (window.innerWidth < 768) return;
 
     let ctx;
-    // Small delay so DOM heights are settled after render
     const id = setTimeout(() => {
       const track = trackRef.current;
       const section = sectionRef.current;
@@ -199,31 +223,68 @@ export default function MyJourney() {
     );
   }
 
+  /* portal: fixed overlay header, takes over once section reaches top */
+  const mobileFixedHeader = typeof document !== "undefined"
+    ? createPortal(
+        <div
+          className="journey-mobile-header-fixed"
+          style={{ display: mobileHeaderVisible ? "block" : "none" }}
+          aria-hidden={!mobileHeaderVisible}
+        >
+          <div className="journey-left-content">
+            <h2 className="journey-heading notable-regular no-cursor-target">
+              MY<br />STORY SO FAR..
+            </h2>
+            <p className="journey-intro">
+              A collection of milestones, roles, and experiences that have
+              shaped who I am as a developer and problem-solver.
+            </p>
+          </div>
+        </div>,
+        document.body
+      )
+    : null;
+
   return (
     <>
-      {/* inject scoped styles */}
       <style>{JOURNEY_CSS}</style>
 
+      {/* fixed overlay — portalled to body so no ancestor can clip/transform it */}
+      {mobileFixedHeader}
+
       <section ref={sectionRef} className="journey-section" id="my-journey">
-        {/* noise overlay */}
         <div className="journey-noise" aria-hidden="true" />
 
-        {/* ── two-column layout ── */}
+        {/*
+          Mobile static header: always in-flow at the top of the section.
+          Visible before the section reaches the viewport top (before fixed header kicks in).
+          Hidden once fixed header takes over (mobileHeaderVisible = true) to avoid duplicate.
+        */}
+        <div className="journey-mobile-static-header" aria-hidden={mobileHeaderVisible}>
+          <div className="journey-left-content">
+            <h2 className="journey-heading notable-regular no-cursor-target">
+              MY<br />STORY SO FAR..
+            </h2>
+            <p className="journey-intro">
+              A collection of milestones, roles, and experiences that have
+              shaped who I am as a developer and problem-solver.
+            </p>
+          </div>
+        </div>
+
+        {/* ── two-column layout (desktop) / cards-only block (mobile) ── */}
         <div className="journey-layout">
 
-          {/* LEFT — pinned intro */}
+          {/* LEFT — desktop only */}
           <div className="journey-left">
-
             <div className="journey-left-content">
               <h2 className="journey-heading notable-regular no-cursor-target">
                 MY<br />STORY SO FAR..
               </h2>
-
               <p className="journey-intro">
                 A collection of milestones, roles, and experiences that have
                 shaped who I am as a developer and problem-solver.
               </p>
-
             </div>
           </div>
 
@@ -261,11 +322,10 @@ export default function MyJourney() {
 
 /* ─── Scoped CSS ──────────────────────────────────────────────────────── */
 const JOURNEY_CSS = `
-/* ── section shell ── */
+/* section shell */
 .journey-section {
   position: relative;
   width: 100%;
-  overflow: hidden;
   background: radial-gradient(circle at center, #FFD500 0%, #FFC300 65%, #FFAA00 100%);
 }
 
@@ -284,7 +344,7 @@ const JOURNEY_CSS = `
   opacity: 0.7;
 }
 
-/* noise */
+/* noise overlay */
 .journey-noise {
   position: absolute;
   inset: 0;
@@ -296,7 +356,17 @@ const JOURNEY_CSS = `
   mix-blend-mode: multiply;
 }
 
-/* ── two-column layout ── */
+/* mobile static header: in-flow, desktop hidden */
+.journey-mobile-static-header {
+  display: none;
+}
+
+/* mobile fixed header: portalled to body, desktop hidden */
+.journey-mobile-header-fixed {
+  display: none;
+}
+
+/* two-column layout */
 .journey-layout {
   position: relative;
   z-index: 2;
@@ -305,7 +375,7 @@ const JOURNEY_CSS = `
   min-height: 100vh;
 }
 
-/* ── LEFT column ── */
+/* LEFT column */
 .journey-left {
   position: relative;
   display: flex;
@@ -344,7 +414,7 @@ const JOURNEY_CSS = `
   opacity: 0.85;
 }
 
-/* ── RIGHT column ── */
+/* RIGHT column */
 .journey-right {
   position: relative;
   overflow: hidden;
@@ -359,7 +429,6 @@ const JOURNEY_CSS = `
   will-change: transform;
 }
 
-/* vertical line */
 .journey-line {
   position: absolute;
   left: 19px;
@@ -371,7 +440,6 @@ const JOURNEY_CSS = `
   z-index: 0;
 }
 
-/* ── each row ── */
 .journey-row {
   position: relative;
   display: flex;
@@ -380,7 +448,6 @@ const JOURNEY_CSS = `
   padding-bottom: 48px;
 }
 
-/* milestone dot */
 .journey-milestone {
   position: relative;
   z-index: 2;
@@ -405,7 +472,6 @@ const JOURNEY_CSS = `
   line-height: 1;
 }
 
-/* card */
 .journey-card {
   flex: 1;
   min-width: 0;
@@ -422,7 +488,6 @@ const JOURNEY_CSS = `
   gap: 12px;
 }
 
-/* date pill inside card */
 .journey-date-pill {
   display: inline-block;
   background: #111;
@@ -496,7 +561,6 @@ const JOURNEY_CSS = `
   letter-spacing: 0.02em;
 }
 
-/* end cap dot */
 .journey-end-cap {
   width: 14px;
   height: 14px;
@@ -507,7 +571,13 @@ const JOURNEY_CSS = `
   margin-bottom: 20px;
 }
 
-/* ── TABLET ── */
+/* DESKTOP / TABLET: restore overflow clipping, GSAP pin manages scroll */
+@media (min-width: 768px) {
+  .journey-section {
+    overflow: hidden;
+  }
+}
+
 @media (max-width: 1024px) {
   .journey-layout {
     grid-template-columns: 38% 62%;
@@ -520,62 +590,123 @@ const JOURNEY_CSS = `
   }
 }
 
-/* ── MOBILE ── */
+/* MOBILE
+   Key insight: position:sticky on a grid child only sticks within its own
+   grid track height. To span the full section, the sticky header must be
+   a direct child of the section (outside the grid), which is what
+   journey-mobile-header provides. The grid left column is hidden on mobile.
+*/
 @media (max-width: 767px) {
   .journey-section {
     overflow: visible;
   }
 
+  /*
+   * Static header: always in-flow at the top of the section.
+   * Visible on initial load before the section reaches the viewport top.
+   * Visually hidden (opacity 0, pointer-events none) once the fixed overlay
+   * takes over — keeps its height so the layout doesn't shift.
+   */
+  .journey-mobile-static-header {
+    display: block;
+    padding: 28px 20px 20px;
+    background: radial-gradient(circle at center, #FFD500 0%, #FFC300 65%, #FFAA00 100%);
+    position: relative;
+    z-index: 2;
+    transition: opacity 0.15s ease;
+  }
+
+  .journey-mobile-static-header[aria-hidden="true"] {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .journey-mobile-static-header .journey-left-content {
+    gap: 6px;
+  }
+
+  .journey-mobile-static-header .journey-heading {
+    font-size: clamp(1.9rem, 9.5vw, 2.8rem);
+    line-height: 0.92;
+  }
+
+  .journey-mobile-static-header .journey-intro {
+    font-size: 0.78rem;
+    max-width: 100%;
+    line-height: 1.45;
+    opacity: 0.8;
+  }
+
+  /*
+   * Fixed overlay header: portalled to <body>, driven by JS.
+   * position:fixed is immune to any ancestor overflow/transform/Lenis virtual scroll.
+   * Shown only while section is scrolled past the top of the viewport.
+   */
+  .journey-mobile-header-fixed {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    padding: 20px 20px 14px;
+    background: radial-gradient(circle at center, #FFD500 0%, #FFC300 65%, #FFAA00 100%);
+    box-shadow: 0 3px 10px rgba(200,140,0,0.35);
+  }
+
+  .journey-mobile-header-fixed .journey-left-content {
+    gap: 6px;
+  }
+
+  .journey-mobile-header-fixed .journey-heading {
+    font-size: clamp(1.9rem, 9.5vw, 2.8rem);
+    line-height: 0.92;
+  }
+
+  .journey-mobile-header-fixed .journey-intro {
+    font-size: 0.78rem;
+    max-width: 100%;
+    line-height: 1.45;
+    opacity: 0.8;
+  }
+
+  /* hide the grid's left column on mobile */
+  .journey-left {
+    display: none;
+  }
+
+  /* grid becomes single column, cards only */
   .journey-layout {
     grid-template-columns: 1fr;
     min-height: unset;
+    overflow: visible;
   }
 
-  /* on mobile the left section is NOT pinned by GSAP;
-     we use CSS sticky so it stays at top while cards scroll */
-  .journey-left {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    padding: 32px 20px 20px;
-    background: radial-gradient(circle at center, #FFD500 0%, #FFC300 65%, #FFAA00 100%);
-  }
-
-  .journey-left-content {
-    gap: 12px;
-  }
-
-  .journey-heading {
-    font-size: clamp(2.4rem, 12vw, 4rem);
-  }
-
-  .journey-intro {
-    font-size: 0.85rem;
-    max-width: 100%;
-  }
-
+  /*
+   * No top padding needed — the static header above the grid provides
+   * the visual space. Cards sit directly below it in normal flow.
+   * When fixed header is active, the static header's height (opacity:0 but
+   * still in-flow) keeps the cards from jumping up.
+   */
   .journey-right {
-    padding: 32px 16px 48px 16px;
-    /* ensure it scrolls above the sticky left */
-    position: relative;
-    z-index: 5;
+    overflow: visible;
+    padding: 16px 16px 48px 16px;
   }
 
   .journey-row {
-    gap: 16px;
-    padding-bottom: 32px;
+    gap: 14px;
+    padding-bottom: 28px;
   }
 
   .journey-card-inner {
-    padding: 16px 16px 14px;
+    padding: 14px 14px 12px;
   }
 
   .journey-card-title {
-    font-size: 0.95rem;
+    font-size: 0.92rem;
   }
 }
 
-/* reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .journey-track {
     transform: none !important;
