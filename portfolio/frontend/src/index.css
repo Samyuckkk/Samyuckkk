@@ -158,12 +158,3 @@ body{
     pointer-events: none;
     font-family: 'Outfit', sans-serif;
 }
-
-/* Custom Cursor Blinking Animation for AboutLoader */
-@keyframes cursor-blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-}
-.animate-cursor-blink {
-    animation: cursor-blink 0.8s step-end infinite;
-}

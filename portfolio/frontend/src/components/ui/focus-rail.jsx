@@ -45,7 +45,6 @@ export function FocusRail({
 }) {
   const [active, setActive] = React.useState(initialIndex);
   const [isHovering, setIsHovering] = React.useState(false);
-  const lastWheelTime = React.useRef(0);
 
   const [tooltipText, setTooltipText] = React.useState(null);
   const [tooltipPos, setTooltipPos] = React.useState({ x: 0, y: 0 });
@@ -92,16 +91,6 @@ export function FocusRail({
 
   const isHoveringCenterCard = hoveredIndex === activeIndex;
 
-  React.useEffect(() => {
-    if (isHoveringCenterCard) {
-      window.lenis?.stop();
-    } else {
-      window.lenis?.start();
-    }
-    return () => {
-      window.lenis?.start();
-    };
-  }, [isHoveringCenterCard]);
 
   // --- NAVIGATION HANDLERS ---
   const handlePrev = React.useCallback(() => {
@@ -113,28 +102,6 @@ export function FocusRail({
     if (!loop && active === count - 1) return;
     setActive((p) => p + 1);
   }, [loop, active, count]);
-
-  // --- MOUSE WHEEL / TRACKPAD LOGIC ---
-  const onWheel = React.useCallback(
-    (e) => {
-      const now = Date.now();
-      // Debounce: prevent rapid firing from inertia scrolling (400ms lockout)
-      if (now - lastWheelTime.current < 400) return;
-
-      const deltaY = e.deltaY;
-      const threshold = 15; // sensitivity threshold
-
-      if (Math.abs(deltaY) > threshold) {
-        lastWheelTime.current = now;
-        if (deltaY > 0) {
-          handleNext();
-        } else {
-          handlePrev();
-        }
-      }
-    },
-    [handleNext, handlePrev]
-  );
 
   // --- KEYBOARD LOGIC ---
   const onKeyDown = React.useCallback(
@@ -187,7 +154,6 @@ export function FocusRail({
       onMouseLeave={() => setIsHovering(false)}
       tabIndex={0}
       onKeyDown={onKeyDown}
-      onWheel={onWheel}
     >
       {/* Background Ambience */}
       <div className="absolute inset-0 z-0 pointer-events-none">

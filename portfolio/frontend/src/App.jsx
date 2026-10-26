@@ -1,7 +1,9 @@
-import { useEffect, useState, useRef } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import Lenis from "lenis";
 import "lenis/dist/lenis.css";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import Loader from "./components/Loader/Loader";
 import TargetCursor from "./components/TargetCursor/TargetCursor";
@@ -9,7 +11,6 @@ import Magnet from "./components/Magnet/Magnet";
 import RotatingText from "./components/RotatingText/RotatingText";
 import ContactModal from "./components/ContactModal/ContactModal";
 import CinematicAbout from "./components/AboutMe/CinematicAbout";
-import AboutLoader from "./components/AboutMe/AboutLoader";
 import MyProjects from "./components/MyProjects/MyProjects";
 import MyJourney from "./components/MyJourney/MyJourney";
 
@@ -20,8 +21,6 @@ import "./index.css";
 
 function App() {
     const [loading, setLoading] = useState(true);
-    const [loaderPlayed, setLoaderPlayed] = useState(false);
-    const [showLoader, setShowLoader] = useState(false);
 
     const messages = [
         "Hire me before someone else does!",
@@ -33,13 +32,6 @@ function App() {
     const [isContactHovered, setIsContactHovered] = useState(false);
     const [isContactModalOpen, setIsContactModalOpen] = useState(false);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
-    const heroRef = useRef(null);
-    const { scrollYProgress: heroScroll } = useScroll({
-        target: heroRef,
-        offset: ["start start", "end start"]
-    });
-    const heroBgOpacity = useTransform(heroScroll, [0, 0.85], [0, 1]);
 
     const [links, setLinks] = useState({
         github: 'github.com/Samyuckkk',
@@ -142,60 +134,21 @@ const lenis = new Lenis({
 
         window.lenis = lenis;
 
-        let rafId;
-        function raf(time) {
-            lenis.raf(time);
-            rafId = requestAnimationFrame(raf);
-        }
+        gsap.registerPlugin(ScrollTrigger);
+        lenis.on('scroll', ScrollTrigger.update);
 
-        rafId = requestAnimationFrame(raf);
+        const updateTicker = (time) => {
+            lenis.raf(time * 1000);
+        };
+        gsap.ticker.add(updateTicker);
+        gsap.ticker.lagSmoothing(0);
 
         return () => {
+            gsap.ticker.remove(updateTicker);
             lenis.destroy();
             window.lenis = undefined;
-            cancelAnimationFrame(rafId);
         };
     }, [loading]);
-
-    useEffect(() => {
-        if (loading) return;
-
-        // If the page is already scrolled past Hero, consider loader as played
-        if (window.scrollY > 100) {
-            setLoaderPlayed(true);
-            return;
-        }
-
-        const handleScroll = () => {
-            if (window.scrollY > 20 && !loaderPlayed && !showLoader) {
-                setShowLoader(true);
-            }
-        };
-
-        window.addEventListener("scroll", handleScroll, { passive: true });
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, [loading, loaderPlayed, showLoader]);
-
-    // Lock scrolling when loader is active
-    useEffect(() => {
-        if (showLoader) {
-            if (window.lenis) window.lenis.stop();
-            document.body.style.overflow = "hidden";
-            document.documentElement.style.overflow = "hidden";
-        }
-    }, [showLoader]);
-
-    // Called by AboutLoader only after its exit animation has fully completed
-    const handleLoaderScrollReady = () => {
-        setShowLoader(false);
-        setLoaderPlayed(true);
-        document.body.style.overflow = "";
-        document.documentElement.style.overflow = "";
-        // Start Lenis after a single frame so it picks up the already-set scrollTop
-        requestAnimationFrame(() => {
-            if (window.lenis) window.lenis.start();
-        });
-    };
 
     return (
         <>
@@ -224,20 +177,12 @@ const lenis = new Lenis({
                 {loading && <Loader key="loader" />}
             </AnimatePresence>
 
-            {showLoader && <AboutLoader key="about-loader" onScrollReady={handleLoaderScrollReady} />}
-
             {!loading ? (
                 <div className="relative w-full">
                     {/* HERO SECTION */}
-                    <div ref={heroRef} className="hero flex-col gap-6 w-full min-h-screen relative overflow-hidden">
+                    <div className="hero flex-col gap-6 w-full min-h-screen relative overflow-hidden">
                         {/* Noise overlay */}
                         <div className="hero-noise" />
-
-                        {/* Black transition overlay */}
-                        <motion.div 
-                            className="absolute inset-0 bg-black pointer-events-none z-[99]"
-                            style={{ opacity: heroBgOpacity }}
-                        />
 
                         {/* Hero Content Wrapper (Foreground) */}
                         <motion.div 
