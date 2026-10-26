@@ -1,366 +1,584 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { motion } from "framer-motion";
-import { Briefcase, GraduationCap, Calendar } from "lucide-react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Magnet from "../Magnet/Magnet";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+gsap.registerPlugin(ScrollTrigger);
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return dateStr;
-  return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
 };
 
-const getIcon = (item) => {
-  const titleLower = (item.title || "").toLowerCase();
-  const companyLower = (item.company || "").toLowerCase();
-  const descLower = (item.description || "").toLowerCase();
-  
-  if (
-    titleLower.includes("bachelor") || 
-    titleLower.includes("degree") || 
-    titleLower.includes("university") || 
-    titleLower.includes("bca") ||
-    titleLower.includes("education") ||
-    titleLower.includes("student") ||
-    companyLower.includes("university") ||
-    companyLower.includes("school") ||
-    companyLower.includes("college") ||
-    companyLower.includes("academy") ||
-    descLower.includes("cgpa") ||
-    descLower.includes("gpa")
-  ) {
-    return GraduationCap;
-  }
-  return Briefcase;
-};
+const sortExperiences = (arr) =>
+  [...arr].sort((a, b) => {
+    if (a.currentlyWorking && !b.currentlyWorking) return -1;
+    if (!a.currentlyWorking && b.currentlyWorking) return 1;
+    return new Date(b.startDate || 0) - new Date(a.startDate || 0);
+  });
 
+
+
+/* ─── Card wrapper: turns cursor black on hover ──────────────────────── */
+function BlackCursorCard({ children }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const getCorners = () => document.querySelectorAll('.target-cursor-corner');
+    const getDot = () => document.querySelector('.fixed.top-0.left-0 .rounded-full');
+    const enter = () => {
+      getCorners().forEach(c => gsap.to(c, { borderColor: '#111111', duration: 0.15, ease: 'power2.out' }));
+      const dot = getDot();
+      if (dot) gsap.to(dot, { backgroundColor: '#111111', duration: 0.15, ease: 'power2.out' });
+    };
+    const leave = () => {
+      getCorners().forEach(c => gsap.to(c, { borderColor: '#ffffff', duration: 0.15, ease: 'power2.out' }));
+      const dot = getDot();
+      if (dot) gsap.to(dot, { backgroundColor: '#ffffff', duration: 0.15, ease: 'power2.out' });
+    };
+    el.addEventListener('mouseenter', enter);
+    el.addEventListener('mouseleave', leave);
+    return () => {
+      el.removeEventListener('mouseenter', enter);
+      el.removeEventListener('mouseleave', leave);
+    };
+  }, []);
+  return <div ref={ref} className="journey-card">{children}</div>;
+}
+
+/* ─── Single journey card ─────────────────────────────────────────────── */
+function JourneyCard({ item }) {
+  const startStr = formatDate(item.startDate);
+  const endStr = item.currentlyWorking ? "Present" : formatDate(item.endDate);
+  const dateLabel =
+    startStr && endStr
+      ? `${startStr} – ${endStr}`
+      : item.timePeriod || "";
+
+  return (
+    <div className="journey-card-inner">
+      {/* date pill */}
+      <span className="journey-date-pill">{dateLabel}</span>
+
+      {/* logo + title row */}
+      <div className="journey-card-header">
+        {item.companyLogo && (
+          <img
+            src={item.companyLogo}
+            alt={item.company}
+            className="journey-logo"
+          />
+        )}
+        <div>
+          <h3 className="journey-card-title">{item.title}</h3>
+          <p className="journey-card-company">{item.company}</p>
+        </div>
+      </div>
+
+      {/* description */}
+      {item.description && (
+        <p className="journey-card-desc">{item.description}</p>
+      )}
+
+      {/* tech badges */}
+      {item.technologies && item.technologies.length > 0 && (
+        <div className="journey-tech-row">
+          {item.technologies.map((t) => (
+            <span key={t} className="journey-tech-badge">
+              {t}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── Main component ──────────────────────────────────────────────────── */
 export default function MyJourney() {
   const [experiences, setExperiences] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchExperiences = async () => {
-      try {
-        const baseUrl = BACKEND_URL.replace(/\/$/, '');
-        const response = await axios.get(`${baseUrl}/experience`);
-        
-        // Extract array from response wrapper safely
-        const experiencesData = Array.isArray(response.data)
-          ? response.data
-          : (response.data && response.data.allExperiences ? response.data.allExperiences : []);
-        
-        setExperiences(experiencesData);
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching experiences:", err);
-        setError("Error loading experience.");
-        setLoading(false);
-      }
-    };
+  const sectionRef = useRef(null);
+  const trackRef = useRef(null);
+  const prefersReducedMotion =
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    fetchExperiences();
+  /* fetch */
+  useEffect(() => {
+    const base = BACKEND_URL.replace(/\/$/, "");
+    axios
+      .get(`${base}/experience`)
+      .then((res) => {
+        const data = Array.isArray(res.data)
+          ? res.data
+          : res.data?.allExperiences ?? [];
+        setExperiences(data);
+      })
+      .catch((err) => {
+        console.error("MyJourney fetch error:", err);
+        setError("Could not load journey entries.");
+      })
+      .finally(() => setLoading(false));
   }, []);
 
+  /* scroll animation */
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    if (!trackRef.current || !sectionRef.current) return;
+    if (experiences.length === 0) return;
+
+    let ctx;
+    // Small delay so DOM heights are settled after render
+    const id = setTimeout(() => {
+      const track = trackRef.current;
+      const section = sectionRef.current;
+      if (!track || !section) return;
+
+      const trackH = track.scrollHeight;
+      const viewH = window.innerHeight;
+      const travelDist = Math.max(0, trackH - viewH + 120);
+
+      ctx = gsap.context(() => {
+        gsap.to(track, {
+          y: -travelDist,
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            start: "top top",
+            end: () => `+=${travelDist + viewH * 0.3}`,
+            scrub: 1,
+            pin: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          },
+        });
+      }, section);
+    }, 120);
+
+    return () => {
+      clearTimeout(id);
+      ctx?.revert();
+    };
+  }, [experiences, prefersReducedMotion]);
+
+  const sorted = sortExperiences(experiences);
+
+  /* ── states ── */
   if (loading) {
     return (
-      <section className="relative w-full min-h-screen bg-[#0c0c0e] py-28 px-4 md:px-12 flex flex-col items-center justify-center select-none overflow-hidden">
-        <div 
-          className="text-white font-outfit text-xl font-medium tracking-wide animate-pulse"
-          style={{ fontFamily: "'Outfit', sans-serif" }}
-        >
-          Loading Experience...
-        </div>
+      <section className="journey-section journey-section--loading">
+        <div className="journey-loading-text">Loading Journey…</div>
       </section>
     );
   }
 
   if (error) {
     return (
-      <section className="relative w-full min-h-screen bg-[#0c0c0e] py-28 px-4 md:px-12 flex flex-col items-center justify-center select-none overflow-hidden">
-        <div 
-          className="text-zinc-500 font-outfit text-lg"
-          style={{ fontFamily: "'Outfit', sans-serif" }}
-        >
+      <section className="journey-section journey-section--loading">
+        <div className="journey-loading-text" style={{ color: "#c0392b" }}>
           {error}
         </div>
       </section>
     );
   }
 
-  if (experiences.length === 0) {
+  if (sorted.length === 0) {
     return (
-      <section className="relative w-full min-h-screen bg-[#0c0c0e] py-28 px-4 md:px-12 flex flex-col items-center justify-center select-none overflow-hidden">
-        {/* Title block */}
-        <div className="mb-20 text-center z-10 relative">
-          <div 
-            className="text-4xl sm:text-5xl font-bold tracking-widest text-white mb-4 uppercase"
-            style={{ 
-              fontFamily: "'Syncopate', sans-serif",
-              letterSpacing: "0.15em"
-            }}
-          >
-            My <span className="text-[#FFD500]">Journey</span>
-          </div>
-          <div className="w-12 h-1 bg-[#FFD500] mt-5 mx-auto rounded-full" />
-        </div>
-        <div 
-          className="text-zinc-500 font-outfit text-lg z-10"
-          style={{ fontFamily: "'Outfit', sans-serif" }}
-        >
-          No experience found.
-        </div>
+      <section className="journey-section journey-section--loading">
+        <div className="journey-loading-text">No journey entries yet.</div>
       </section>
     );
   }
 
-  // Sort experiences before rendering
-  // 1. Currently working first
-  // 2. Sort by startDate descending
-  const sortedExperiences = [...experiences].sort((a, b) => {
-    if (a.currentlyWorking && !b.currentlyWorking) return -1;
-    if (!a.currentlyWorking && b.currentlyWorking) return 1;
-    const dateA = new Date(a.startDate || 0);
-    const dateB = new Date(b.startDate || 0);
-    return dateB.getTime() - dateA.getTime();
-  });
-
   return (
-    <section className="relative w-full min-h-screen bg-[#0c0c0e] py-28 px-4 md:px-12 flex flex-col items-center justify-start select-none overflow-hidden"
-    style={{
-      marginTop: "50px"
-    }}
-    >
-      
-      {/* Premium ambient backdrop glow */}
-      <div className="absolute right-[-10%] bottom-[-10%] w-[350px] h-[350px] rounded-full bg-[#FFD500]/5 blur-[120px] pointer-events-none z-0" />
-      <div className="absolute left-[-10%] top-[-10%] w-[350px] h-[350px] rounded-full bg-amber-500/5 blur-[120px] pointer-events-none z-0" />
+    <>
+      {/* inject scoped styles */}
+      <style>{JOURNEY_CSS}</style>
 
-      {/* Title block - div tag to prevent target cursor snap brackets */}
-      <div className="mb-20 text-center z-10 relative"   
-      style={{
-    marginBottom: "20px",
-  }}>
-        <div 
-          className="text-2xl sm:text-4xl md:text-5xl font-bold tracking-widest text-white mb-4 uppercase"
-          style={{ 
-            fontFamily: "'Syncopate', sans-serif",
-            letterSpacing: "0.15em"
-          }}
-        >
-          My <span className="text-[#FFD500]">Journey</span>
-        </div>
-        {/* <p 
-          className="text-neutral-400 font-outfit font-light text-base sm:text-lg max-w-md mx-auto"
-          style={{ fontFamily: "'Outfit', sans-serif" }}
-        >
-          Milestones of professional experience and growth.
-        </p> */}
-        {/* <div className="w-12 h-1 bg-[#FFD500] mt-5 mx-auto rounded-full" /> */}
-      </div>
+      <section ref={sectionRef} className="journey-section" id="my-journey">
+        {/* noise overlay */}
+        <div className="journey-noise" aria-hidden="true" />
 
-      {/* Timeline Wrapper */}
-      <div className="relative w-full max-w-4xl mx-auto z-10">
-        
-        {/* Central timeline line */}
-        <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-[2px] bg-gradient-to-b from-[#FFD500] via-[#FFD500]/50 to-transparent transform md:-translate-x-1/2 pointer-events-none" />
+        {/* ── two-column layout ── */}
+        <div className="journey-layout">
 
-        {/* Timeline Items */}
-        <div className="space-y-12 md:space-y-16"
-          style={{
-            marginTop: "50px",
-    marginBottom: "50px",
-  }}
-        >
-          {sortedExperiences.map((item, idx) => {
-            const Icon = getIcon(item);
-            // Pattern: Experience 1 (index 0) -> Right side (isRight = true)
-            //          Experience 2 (index 1) -> Left side (isRight = false)
-            const isRight = idx % 2 === 0;
+          {/* LEFT — pinned intro */}
+          <div className="journey-left">
 
-            // Generate timeline period string
-            const startStr = formatDate(item.startDate);
-            const endStr = item.currentlyWorking ? "Present" : formatDate(item.endDate);
-            const dateLabel = startStr && endStr ? `${startStr} - ${endStr}` : (item.timePeriod || "");
+            <div className="journey-left-content">
+              <h2 className="journey-heading notable-regular no-cursor-target">
+                MY<br />STORY SO FAR..
+              </h2>
 
-            return (
-              <div 
-                key={item._id}
-                className="relative flex flex-col md:flex-row items-center md:justify-between w-full"
-              >
-                {/* Timeline node */}
-                <div className="absolute left-4 md:left-1/2 top-6 md:top-1/2 w-8 h-8 rounded-full bg-neutral-900 border-2 border-[#FFD500] flex items-center justify-center transform -translate-x-[15px] md:-translate-x-1/2 md:-translate-y-1/2 z-20 shadow-[0_0_10px_rgba(255,213,0,0.2)] hover:scale-110 hover:shadow-[0_0_15px_rgba(255,213,0,0.5)] transition-all duration-300">
-                  <Icon className="w-3.5 h-3.5 text-[#FFD500]" />
-                </div>
+              <p className="journey-intro">
+                A collection of milestones, roles, and experiences that have
+                shaped who I am as a developer and problem-solver.
+              </p>
 
-                {/* Left side space (desktop only) */}
-                <div className="hidden md:block w-[45%] text-right pr-8">
-                  {isRight ? (
-                    /* Date Badge on the Left side of line */
-                    <motion.div 
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true, margin: "-100px" }}
-                      transition={{ duration: 0.6, ease: "easeOut" }}
-                    >
-                      <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFD500]/10 border border-[#FFD500]/20 text-[#FFD500] text-xs font-mono"
-                      style={{
-                        borderRadius: "10px",
-  padding: "5px 15px",
-}}
-                      >
-                        <Calendar className="w-3.5 h-3.5" />
-                        {dateLabel}
-                      </div>
-                    </motion.div>
-                  ) : (
-                    /* Card on the Left side of line */
-                    <motion.div 
-                      className="cursor-target w-full"
-                      initial={{ opacity: 0, x: -30 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true, margin: "-100px" }}
-                      transition={{ duration: 0.6, ease: "easeOut" }}
-                    >
-                      <Magnet padding={5} magnetStrength={5} wrapperClassName="w-full" innerClassName="w-full">
-                        <JourneyCard item={item} isRight={isRight} dateLabel={dateLabel} />
-                      </Magnet>
-                    </motion.div>
-                  )}
-                </div>
+            </div>
+          </div>
 
-                {/* Right side space (desktop only) */}
-                <div className="hidden md:block w-[45%] text-left pl-8">
-                  {!isRight ? (
-                    /* Date Badge on the Right side of line */
-                    <motion.div 
-                      initial={{ opacity: 0, x: 20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true, margin: "-100px" }}
-                      transition={{ duration: 0.6, ease: "easeOut" }}
-                    >
-                      <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFD500]/10 border border-[#FFD500]/20 text-[#FFD500] text-xs font-mono"
-                      style={{
-                        borderRadius: "10px",
-  padding: "5px 15px",
-}}
-                      >
-                        <Calendar className="w-3.5 h-3.5" />
-                        {dateLabel}
-                      </div>
-                    </motion.div>
-                  ) : (
-                    /* Card on the Right side of line */
-                    <motion.div 
-                      className="cursor-target w-full"
-                      initial={{ opacity: 0, x: 30 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true, margin: "-100px" }}
-                      transition={{ duration: 0.6, ease: "easeOut" }}
-                    >
-                      <Magnet padding={5} magnetStrength={5} wrapperClassName="w-full" innerClassName="w-full">
-                        <JourneyCard item={item} isRight={isRight} dateLabel={dateLabel} />
-                      </Magnet>
-                    </motion.div>
-                  )}
-                </div>
+          {/* RIGHT — scrolling timeline */}
+          <div className="journey-right">
+            <div ref={trackRef} className="journey-track">
+              {/* vertical timeline line */}
+              <div className="journey-line" aria-hidden="true" />
 
-                {/* Mobile view (stacked, pl-12) */}
-                <div className="block md:hidden w-full pl-12 py-2">
-                  <motion.div 
-                    className="cursor-target w-full"
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ duration: 0.6, ease: "easeOut" }}
-                  >
-                    <Magnet disabled={true} wrapperClassName="w-full" innerClassName="w-full">
-                      <JourneyCard item={item} isRight={isRight} dateLabel={dateLabel} isMobile={true} />
+              {sorted.map((item, idx) => (
+                <div key={item._id} className="journey-row">
+                  {/* milestone dot */}
+                  <div className="journey-milestone cursor-target">
+                    <span className="journey-milestone-num">{idx + 1}</span>
+                  </div>
+
+                  {/* card */}
+                  <BlackCursorCard>
+                    <Magnet padding={20} magnetStrength={15} wrapperClassName="cursor-target w-full" innerClassName="w-full">
+                      <JourneyCard item={item} />
                     </Magnet>
-                  </motion.div>
+                  </BlackCursorCard>
                 </div>
+              ))}
 
-              </div>
-            );
-          })}
-        </div>
-
-      </div>
-
-    </section>
-  );
-}
-
-function JourneyCard({ item, dateLabel, isMobile = false }) {
-  return (
-    <div className="group relative bg-zinc-900/40 border border-zinc-800/80 hover:border-[#FFD500]/30 hover:bg-zinc-900/60 backdrop-blur-md rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 shadow-lg text-left"
-    style={{
-      padding: "20px"
-    }}
-    >
-      
-      {/* Date Badge (mobile only) */}
-      {isMobile && (
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFD500]/10 border border-[#FFD500]/20 text-[#FFD500] text-xs font-mono mb-4">
-          <Calendar className="w-3 h-3" />
-          {dateLabel}
-        </div>
-      )}
-
-      {/* Company Logo, Title, and Company Wrapper */}
-      <div className="flex items-start gap-4 mb-4">
-        {/* Company Logo */}
-        {item.companyLogo && (
-          <img 
-            src={item.companyLogo} 
-            alt={item.company}
-            className="w-12 h-12 rounded-xl object-cover border border-zinc-800 bg-neutral-900 shrink-0" 
-          />
-        )}
-
-        {/* Title & Company Stack */}
-        <div className="flex flex-col">
-          {/* {item.technologies && item.technologies.length > 0 && (
-            <span className="text-xs font-medium uppercase tracking-wider text-emerald-400 mb-2 block text-left">
-              {item.technologies.join(" • ")}
-            </span>
-          )} */}
-          <h3 
-            className="text-white text-xl font-bold tracking-tight mb-1"
-            style={{ fontFamily: "'Outfit', sans-serif" }}
-          >
-            {item.title}
-          </h3>
-          <div 
-            className="text-[#FFD500] text-sm font-medium"
-            style={{ fontFamily: "'Outfit', sans-serif" }}
-          >
-            {item.company}
+              {/* end cap */}
+              <div className="journey-end-cap" aria-hidden="true" />
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Description */}
-      <p 
-        className="text-neutral-400 text-sm leading-relaxed font-light mb-4"
-        style={{ fontFamily: "'Outfit', sans-serif", paddingTop: "10px" }}
-      >
-        {item.description}
-      </p>
-
-      {item.technologies && item.technologies.length > 0 && (
-            <span className="text-xs font-medium uppercase tracking-wider text-emerald-400 mb-2 block text-left"
-            style={{
-              marginTop: "10px"
-            }}
-            >
-              {item.technologies.join(" • ")}
-            </span>
-          )}
-
-    </div>
+      </section>
+    </>
   );
 }
+
+/* ─── Scoped CSS ──────────────────────────────────────────────────────── */
+const JOURNEY_CSS = `
+/* ── section shell ── */
+.journey-section {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: radial-gradient(circle at center, #FFD500 0%, #FFC300 65%, #FFAA00 100%);
+}
+
+.journey-section--loading {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.journey-loading-text {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #111;
+  opacity: 0.7;
+}
+
+/* noise */
+.journey-noise {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.08;
+  background: #ffffff;
+  filter: url(#noiseFilter);
+  mix-blend-mode: multiply;
+}
+
+/* ── two-column layout ── */
+.journey-layout {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 42% 58%;
+  min-height: 100vh;
+}
+
+/* ── LEFT column ── */
+.journey-left {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  padding: 80px 32px 80px 48px;
+  overflow: hidden;
+}
+
+.journey-left-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.journey-heading {
+  font-family: 'Notable', sans-serif;
+  font-size: clamp(3rem, 6vw, 6.5rem);
+  font-weight: 400;
+  line-height: 0.88;
+  color: #111;
+  letter-spacing: 0em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.journey-intro {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(0.9rem, 1.3vw, 1.1rem);
+  font-weight: 400;
+  color: #222;
+  line-height: 1.65;
+  max-width: 340px;
+  opacity: 0.85;
+}
+
+/* ── RIGHT column ── */
+.journey-right {
+  position: relative;
+  overflow: hidden;
+  padding: 80px 48px 80px 24px;
+}
+
+.journey-track {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  will-change: transform;
+}
+
+/* vertical line */
+.journey-line {
+  position: absolute;
+  left: 19px;
+  top: 24px;
+  bottom: 40px;
+  width: 3px;
+  background: #111;
+  border-radius: 2px;
+  z-index: 0;
+}
+
+/* ── each row ── */
+.journey-row {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+  padding-bottom: 48px;
+}
+
+/* milestone dot */
+.journey-milestone {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #FFD500;
+  border: 3px solid #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  margin-top: 4px;
+}
+
+.journey-milestone-num {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #111;
+  line-height: 1;
+}
+
+/* card */
+.journey-card {
+  flex: 1;
+  min-width: 0;
+}
+
+.journey-card-inner {
+  background: #FEFAE8;
+  border-radius: 18px;
+  padding: 22px 24px 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
+  border: 1.5px solid rgba(0,0,0,0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* date pill inside card */
+.journey-date-pill {
+  display: inline-block;
+  background: #111;
+  color: #fff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 4px 12px;
+  border-radius: 999px;
+  width: fit-content;
+}
+
+.journey-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.journey-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1.5px solid rgba(0,0,0,0.1);
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.journey-card-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #111;
+  margin: 0 0 2px;
+  line-height: 1.2;
+}
+
+.journey-card-company {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #D4900A;
+  margin: 0;
+}
+
+.journey-card-desc {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: #555;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.journey-tech-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.journey-tech-badge {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #1a6b4a;
+  background: #d1fae5;
+  border: 1px solid #6ee7b7;
+  border-radius: 999px;
+  padding: 3px 10px;
+  letter-spacing: 0.02em;
+}
+
+/* end cap dot */
+.journey-end-cap {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #111;
+  margin-left: 13px;
+  margin-top: -24px;
+  margin-bottom: 20px;
+}
+
+/* ── TABLET ── */
+@media (max-width: 1024px) {
+  .journey-layout {
+    grid-template-columns: 38% 62%;
+  }
+  .journey-left {
+    padding: 60px 20px 60px 28px;
+  }
+  .journey-right {
+    padding: 60px 28px 60px 16px;
+  }
+}
+
+/* ── MOBILE ── */
+@media (max-width: 767px) {
+  .journey-section {
+    overflow: visible;
+  }
+
+  .journey-layout {
+    grid-template-columns: 1fr;
+    min-height: unset;
+  }
+
+  /* on mobile the left section is NOT pinned by GSAP;
+     we use CSS sticky so it stays at top while cards scroll */
+  .journey-left {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    padding: 32px 20px 20px;
+    background: radial-gradient(circle at center, #FFD500 0%, #FFC300 65%, #FFAA00 100%);
+  }
+
+  .journey-left-content {
+    gap: 12px;
+  }
+
+  .journey-heading {
+    font-size: clamp(2.4rem, 12vw, 4rem);
+  }
+
+  .journey-intro {
+    font-size: 0.85rem;
+    max-width: 100%;
+  }
+
+  .journey-right {
+    padding: 32px 16px 48px 16px;
+    /* ensure it scrolls above the sticky left */
+    position: relative;
+    z-index: 5;
+  }
+
+  .journey-row {
+    gap: 16px;
+    padding-bottom: 32px;
+  }
+
+  .journey-card-inner {
+    padding: 16px 16px 14px;
+  }
+
+  .journey-card-title {
+    font-size: 0.95rem;
+  }
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .journey-track {
+    transform: none !important;
+  }
+}
+`;
