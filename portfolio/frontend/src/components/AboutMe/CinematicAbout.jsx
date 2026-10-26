@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import TiltedCard from "../TiltedCard/TiltedCard";
 import Magnet from "../Magnet/Magnet";
 import LogoLoop from "../LogoLoop/LogoLoop";
@@ -37,6 +39,9 @@ const techLogos = [
 ];
 
 export default function CinematicAbout() {
+    const sectionRef = useRef(null);
+    const containerRef = useRef(null);
+
     const [dimensions, setDimensions] = useState({
         width: typeof window !== "undefined" ? window.innerWidth : 1200,
         height: typeof window !== "undefined" ? window.innerHeight : 800
@@ -48,22 +53,54 @@ export default function CinematicAbout() {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
+    useEffect(() => {
+        gsap.registerPlugin(ScrollTrigger);
+
+        if (sectionRef.current && containerRef.current) {
+            const ctx = gsap.context(() => {
+                gsap.fromTo(
+                    containerRef.current,
+                    { yPercent: 12 },
+                    {
+                        yPercent: 0,
+                        ease: "none",
+                        scrollTrigger: {
+                            trigger: sectionRef.current,
+                            start: "top bottom",
+                            end: "top top",
+                            scrub: true,
+                        }
+                    }
+                );
+            }, sectionRef);
+
+            return () => ctx.revert();
+        }
+    }, []);
+
     const isMobile = dimensions.width < 640;
     const isTablet = dimensions.width >= 640 && dimensions.width < 1024;
 
     const handleDownload = () => {
-        window.open("https://ik.imagekit.io/samyuck/Portfolio/Resume/43693d67-c95c-4b61-9cc0-18e0117c4c5b_XAHx3fUoC", '_blank');
+        window.open("https://ik.imagekit.io/samyuck/Portfolio/Resume/f58465be-7dae-4225-8065-978e37ab6323__IKJ7QJxGH", '_blank');
     };
 
     return (
-        <section id="about-me" className="relative w-full bg-[#0c0c0e] select-none z-50" style={{ minHeight: '100dvh' }}>
-            {/* Subtle paper noise texture */}
-            <div className="absolute inset-0 bg-white pointer-events-none z-[1] opacity-[0.02] filter url(#noiseFilter)" />
+        <section ref={sectionRef} id="about-me" className="relative w-full overflow-hidden flex items-center justify-center py-4 sm:py-8 md:py-12 lg:py-16 px-2 sm:px-4 md:px-6 select-none z-50 min-h-screen" style={{ background: 'radial-gradient(circle at center, #FFD500 0%, #FFC300 65%, #FFAA00 100%)' }}>
+            {/* Hero-matching noise overlay */}
+            <div className="hero-noise" />
 
-            <div className="relative z-10 w-full flex flex-col justify-between" style={{ minHeight: 'inherit', paddingLeft: 'clamp(1.5rem, 6vw, 8rem)', paddingRight: 'clamp(1.5rem, 6vw, 8rem)', paddingTop: 'clamp(2rem, 5vw, 5rem)', paddingBottom: 'clamp(2rem, 4vw, 4rem)' }}>
+            {/* Slightly smaller black container sitting on top of Hero-style background with smooth GSAP ScrollTrigger parallax */}
+            <div 
+                ref={containerRef}
+                style={{ minHeight: 'calc(100vh - 4rem)', paddingLeft: 'clamp(1.5rem, 5vw, 6rem)', paddingRight: 'clamp(1.5rem, 5vw, 6rem)', paddingTop: 'clamp(2rem, 5vw, 4rem)', paddingBottom: 'clamp(2rem, 4vw, 4rem)' }}
+                className="relative z-10 w-full max-w-[98%] xl:max-w-[96%] bg-[#0c0c0e] rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-zinc-800/50 flex flex-col justify-between"
+            >
+                {/* Subtle paper noise texture inside black container */}
+                <div className="absolute inset-0 bg-white pointer-events-none z-[1] opacity-[0.02] filter url(#noiseFilter)" />
 
                 {/* ── ROW 1: Two-column grid ── */}
-                <div className="w-full grid grid-cols-1 lg:grid-cols-[1.3fr_0.9fr] gap-12 lg:gap-20 xl:gap-24 items-center">
+                <div className="relative z-10 w-full grid grid-cols-1 lg:grid-cols-[1.3fr_0.9fr] gap-12 lg:gap-20 xl:gap-24 items-center">
 
                     {/* LEFT COLUMN: Heading + Bio + Button */}
                     <div className="flex flex-col items-start w-full">
@@ -73,17 +110,17 @@ export default function CinematicAbout() {
                                 fontFamily: '"Anton SC", sans-serif',
                                 fontWeight: 400,
                                 fontStyle: 'normal',
-                                fontSize: 'clamp(2.5rem, 8.5vw, 9vw)',
+                                fontSize: 'clamp(2.2rem, 7.5vw, 7.8vw)',
                                 lineHeight: 1,
-                                marginBottom: 'clamp(1.5rem, 4vw, 4rem)',
+                                marginBottom: 'clamp(1.2rem, 3vw, 3rem)',
                             }}
                         >
                             About Me.
                         </h2>
 
                         <p
-                            className="text-base sm:text-lg md:text-xl text-zinc-300 leading-relaxed font-outfit mt-8 sm:mt-10"
-                            style={{ fontWeight: 300 }}
+                            className="text-lg sm:text-xl md:text-2xl text-zinc-300 leading-relaxed mt-6 sm:mt-8"
+                            style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 300 }}
                         >
                             I build modern web applications, solve real-world problems, and occasionally spend way too long looking for a missing semicolon. I enjoy turning ideas into products that are fast, intuitive, and actually fun to use. When I'm not coding, I'm probably solving LeetCode problems, exploring new technologies, participating in hackathons, or explaining to Git why I totally meant to push from the wrong branch.
                         </p>
@@ -103,7 +140,7 @@ export default function CinematicAbout() {
                     </div>
 
                     {/* RIGHT COLUMN: Profile Card */}
-                    <div className="w-full flex justify-center lg:justify-end items-center">
+                    <div className="flex justify-center items-center w-full lg:justify-end">
                         <TiltedCard
                             className="cursor-target"
                             imageSrc="https://ik.imagekit.io/samyuck/Portfolio/Profile/1d3c930c-b2cb-49a1-a5c5-f5583904a834_1BCCcaBZg"
@@ -134,7 +171,7 @@ export default function CinematicAbout() {
                 </div>
 
                 {/* ── ROW 2: Full-width tech stack ── */}
-                <div style={{ width: 'clamp(95%, 90vw, 90%)', margin: '0 auto' }}>
+                <div className="relative z-10" style={{ width: 'clamp(95%, 90vw, 90%)', margin: '0 auto' }}>
                     <LogoLoop
                         logos={techLogos}
                         speed={60}
