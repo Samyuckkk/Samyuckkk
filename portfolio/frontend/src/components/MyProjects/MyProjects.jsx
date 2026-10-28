@@ -687,7 +687,7 @@ const CSS = `
   }
   .pj-right {
     top: 50vh;
-    transform: translateY(-50%);
+    transform: translateY(-10%);
   }
   .pj-timeline {
     gap: 8px;
@@ -744,7 +744,7 @@ const CSS = `
     max-width: 400px;
   }
   .pj-heading {
-    font-size: clamp(5rem, 5.5vw, 5.25rem);
+    font-size: clamp(4rem, 4.5vw, 5rem);
     letter-spacing: -0.05em;
   }
 }
