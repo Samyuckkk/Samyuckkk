@@ -339,7 +339,7 @@ const CSS = `
   inset: 0;
   pointer-events: none;
   z-index: 1;
-  opacity: 0.07;
+  opacity: 0.12;
   background: #ffffff;
   filter: url(#noiseFilter);
   mix-blend-mode: multiply;
@@ -686,7 +686,7 @@ const CSS = `
   }
   .pj-right {
     top: 50vh;
-    transform: translate(-80px, -50%);
+    transform: translateY(-50%);
   }
   .pj-timeline {
     gap: 8px;
@@ -720,7 +720,7 @@ const CSS = `
 
 @media (min-width: 1101px) and (max-width: 1359px) {
   .pj-heading {
-    font-size: 2.5rem;
+    font-size: clamp(2.2rem, 3vw, 2.4rem);
   }
 }
 
