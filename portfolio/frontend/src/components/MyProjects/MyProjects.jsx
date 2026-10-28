@@ -5,53 +5,6 @@ import ScrollStack, { ScrollStackItem } from "./ScrollStack";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 const pad = (n) => String(n + 1).padStart(2, "0");
 
-/* ─── SVG doodles ─────────────────────────────────────────────────────── */
-function DoodleArrow() {
-  return (
-    <svg width="110" height="80" viewBox="0 0 110 80" fill="none" aria-hidden="true"
-      style={{ position: "absolute", bottom: "16%", left: "55%", opacity: 0.7 }}>
-      <path d="M8 70 C 20 40, 60 10, 100 18" stroke="#111" strokeWidth="2.2"
-        strokeDasharray="5 4" strokeLinecap="round" fill="none" />
-      <path d="M92 10 L102 20 L88 24" stroke="#111" strokeWidth="2.2"
-        strokeLinecap="round" strokeLinejoin="round" fill="none" />
-    </svg>
-  );
-}
-function DoodleSparkle({ style }) {
-  return (
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true" style={style}>
-      <path d="M11 1 L12.5 9.5 L21 11 L12.5 12.5 L11 21 L9.5 12.5 L1 11 L9.5 9.5 Z"
-        stroke="#111" strokeWidth="1.6" strokeLinejoin="round" fill="none" />
-    </svg>
-  );
-}
-function DoodlePaperPlane({ style }) {
-  return (
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" style={style}>
-      <path d="M2 16 L30 4 L20 28 L14 18 Z" stroke="#111" strokeWidth="1.8"
-        strokeLinejoin="round" fill="none" />
-      <path d="M14 18 L30 4" stroke="#111" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  );
-}
-function DoodleUnderline() {
-  return (
-    <svg width="260" height="18" viewBox="0 0 260 18" fill="none" aria-hidden="true"
-      style={{ display: "block", marginTop: "6px" }}>
-      <path d="M4 12 C 40 4, 120 16, 200 8 C 230 4, 248 10, 256 14"
-        stroke="#111" strokeWidth="3.2" strokeLinecap="round" fill="none" />
-    </svg>
-  );
-}
-function CornerFrame({ style }) {
-  return (
-    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true" style={style}>
-      <path d="M2 18 L2 2 L18 2" stroke="#111" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M18 34 L34 34 L34 18" stroke="#111" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 /* ─── Icons ───────────────────────────────────────────────────────────── */
 function GithubIcon() {
   return (
@@ -229,8 +182,13 @@ export default function MyProjects() {
     const base = BACKEND_URL.replace(/\/$/, "");
     axios.get(`${base}/project`)
       .then((res) => {
-        const data = Array.isArray(res.data) ? res.data : res.data?.projects ?? [];
+        const data = Array.isArray(res.data)
+          ? res.data
+          : Array.isArray(res.data?.projects)
+            ? res.data.projects
+            : [];
         setProjects(data);
+        setActiveIndex(0);
       })
       .catch((err) => {
         console.error("MyProjects fetch error:", err);
@@ -301,19 +259,11 @@ export default function MyProjects() {
             <div className="pj-left-inner">
               <div className="pj-heading-box">
                 <h2 className="pj-heading">MY<br />PROJECTS.</h2>
-                <DoodleUnderline />
-                <DoodleSparkle style={{ position: "absolute", top: "-12px", right: "-24px", opacity: 0.7 }} />
-                <DoodleSparkle style={{ position: "absolute", top: "28px", right: "-44px", opacity: 0.45, transform: "scale(0.7)" }} />
               </div>
               <p className="pj-desc">
                 A collection of projects where I turned ideas into real products,
                 solving problems and learning something new along the way.
               </p>
-              <DoodlePaperPlane style={{ marginTop: "24px", opacity: 0.65 }} />
-              <div style={{ position: "relative", height: "80px", marginTop: "6px" }}>
-                <DoodleArrow />
-              </div>
-              <CornerFrame style={{ marginTop: "auto", opacity: 0.55 }} />
             </div>
           </div>
 
@@ -643,7 +593,7 @@ const CSS = `
   position: sticky;
   top: 100px;
   align-self: start;
-  z-index: 10;
+  z-index: 51;
 }
 .pj-timeline-wrap { width: 100%; }
 .pj-timeline {
@@ -733,12 +683,6 @@ const CSS = `
   }
   .pj-heading {
     font-size: 2.55rem;
-  }
-  .pj-heading-box > svg:nth-of-type(2) {
-    right: 4px !important;
-  }
-  .pj-heading-box > svg:nth-of-type(3) {
-    right: 18px !important;
   }
   .pj-right {
     top: 50vh;
