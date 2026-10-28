@@ -682,7 +682,8 @@ const CSS = `
     box-sizing: border-box;
   }
   .pj-heading {
-    font-size: 2.1rem;
+    // font-size: 2.55rem;
+    font-size: 2.2rem;
   }
   .pj-right {
     top: 50vh;
@@ -718,7 +719,7 @@ const CSS = `
   }
 }
 
-@media (min-width: 1101px) and (max-width: 1359px) {
+@media (min-width: 1101px) and (max-width: 1439px) {
   .pj-heading {
     font-size: clamp(2.2rem, 3vw, 2.4rem);
   }
