@@ -476,8 +476,8 @@ const CSS = `
   justify-content: center;
   width: 38px; height: 38px;
   border-radius: 10px;
-  background: #FFE566;
-  border: 1.5px solid #111;
+  background: #a161f4;
+  border: 1px solid #111;
   font-family: 'Outfit', sans-serif;
   font-size: 0.88rem;
   font-weight: 800;
@@ -500,8 +500,8 @@ const CSS = `
   font-size: 0.7rem;
   font-weight: 700;
   color: #111;
-  background: #FFE566;
-  border: 1.5px solid #111;
+  background: #a161f4;
+  border: 1px solid #111;
   border-radius: 999px;
   padding: 3px 12px;
   letter-spacing: 0.04em;
@@ -630,20 +630,20 @@ const CSS = `
   flex-shrink: 0;
   width: 36px; height: 36px;
   border-radius: 50%;
-  background: #FFE566;
-  border: 2px solid #111;
+  background: #565656;
+  border: 1px solid #111;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: 'Outfit', sans-serif;
   font-size: 0.72rem;
   font-weight: 800;
-  color: #111;
+  color: #fff;
   transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 .pj-timeline-item--active .pj-timeline-dot {
-  background: #111;
-  color: #FFE566;
+  background: #a161f4;
+  color: #111;
   transform: scale(1.1);
 }
 .pj-timeline-label {
@@ -686,7 +686,7 @@ const CSS = `
     font-size: 2.2rem;
   }
   .pj-right {
-    top: 50vh;
+    top: 35vh;
     transform: translateY(-10%);
   }
   .pj-timeline {
@@ -801,12 +801,12 @@ const CSS = `
   .pj-mobile-dot {
     width: 32px; height: 32px;
     border-radius: 50%;
-    background: #FFE566;
-    border: 1.5px solid #111;
+    background: #565656;
+    border: 1px solid #111;
     font-family: 'Outfit', sans-serif;
     font-size: 0.72rem;
     font-weight: 800;
-    color: #111;
+    color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -814,8 +814,8 @@ const CSS = `
     transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
   }
   .pj-mobile-dot--active {
-    background: #111;
-    color: #FFE566;
+    background: #a161f4;
+    color: #111;
     transform: scale(1.1);
   }
   .pj-mobile-active-title {
