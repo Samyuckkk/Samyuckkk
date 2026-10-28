@@ -682,7 +682,7 @@ const CSS = `
     box-sizing: border-box;
   }
   .pj-heading {
-    font-size: 2.55rem;
+    font-size: 2.1rem;
   }
   .pj-right {
     top: 50vh;
