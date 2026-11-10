@@ -86,15 +86,15 @@ export default function CinematicAbout() {
     };
 
     return (
-        <section ref={sectionRef} id="about-me" className="relative w-full overflow-hidden flex items-center justify-center py-4 sm:py-8 md:py-12 lg:py-16 px-2 sm:px-4 md:px-6 select-none z-50 min-h-screen" style={{ background: 'radial-gradient(circle at center, #FFD500 0%, #FFC300 65%, #FFAA00 100%)' }}>
+        <section ref={sectionRef} id="about-me" className="relative w-full overflow-x-hidden flex items-center justify-center py-4 sm:py-8 md:py-12 lg:py-16 px-2 sm:px-4 md:px-6 select-none z-50 min-h-screen" style={{ background: 'var(--portfolio-sunburst)' }}>
             {/* Hero-matching noise overlay */}
             <div className="hero-noise" />
 
             {/* Slightly smaller black container sitting on top of Hero-style background with smooth GSAP ScrollTrigger parallax */}
             <div 
                 ref={containerRef}
-                style={{ minHeight: 'calc(100vh - 4rem)', paddingLeft: 'clamp(1.5rem, 5vw, 6rem)', paddingRight: 'clamp(1.5rem, 5vw, 6rem)', paddingTop: 'clamp(2rem, 5vw, 4rem)', paddingBottom: 'clamp(2rem, 4vw, 4rem)' }}
-                className="relative z-10 w-full max-w-[98%] xl:max-w-[96%] bg-[#0c0c0e] rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-zinc-800/50 flex flex-col justify-between"
+                style={{ minHeight: 'calc(100vh - 4rem)', paddingLeft: 'clamp(1.5rem, 5vw, 6rem)', paddingRight: 'clamp(1.5rem, 5vw, 6rem)', paddingTop: 'clamp(2rem, 5vw, 4rem)', paddingBottom: 'clamp(2rem, 4vw, 4rem)', rowGap: 'clamp(2.75rem, 6.25vw, 6.25rem)' }}
+                className="relative z-10 w-full max-w-[98%] xl:max-w-[96%] bg-[#0c0c0e] rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-zinc-800/50 flex flex-col"
             >
                 {/* Subtle paper noise texture inside black container */}
                 <div className="absolute inset-0 bg-white pointer-events-none z-[1] opacity-[0.02] filter url(#noiseFilter)" />
@@ -105,7 +105,7 @@ export default function CinematicAbout() {
                     {/* LEFT COLUMN: Heading + Bio + Button */}
                     <div className="flex flex-col items-start w-full">
                         <h2
-                            className="font-extrabold uppercase tracking-tight whitespace-nowrap no-cursor-target select-none text-amber-500"
+                            className="font-extrabold uppercase tracking-tight whitespace-nowrap no-cursor-target select-none"
                             style={{
                                 fontFamily: '"Anton SC", sans-serif',
                                 fontWeight: 400,
@@ -115,14 +115,17 @@ export default function CinematicAbout() {
                                 marginBottom: 'clamp(1.2rem, 3vw, 3rem)',
                             }}
                         >
-                            About Me.
+                            <span className="block text-white">HI, I'M <span className="font-light italic" style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 300 }}>SAMYAK,</span></span>
+                            {/* <span className="block text-white">A VIBE BUILDER WITH</span> */}
+                            <span className="block text-white">AN ENGINEER WITH</span>
+                            <span className="block text-[#FFA500]">A CURIOUS MIND.</span>
                         </h2>
 
                         <p
                             className="text-lg sm:text-xl md:text-2xl text-zinc-300 leading-relaxed mt-6 sm:mt-8"
                             style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 300 }}
                         >
-                            I build modern web applications, solve real-world problems, and occasionally spend way too long looking for a missing semicolon. I enjoy turning ideas into products that are fast, intuitive, and actually fun to use. When I'm not coding, I'm probably solving LeetCode problems, exploring new technologies, participating in hackathons, or explaining to Git why I totally meant to push from the wrong branch.
+                            I turn random ideas (and occasional overthinking) into real, usable products. Most days you'll find me coding, solving LeetCode, exploring new tech, or in the middle of a hackathon - basically <span className="font-bold text-[#FFA500]">building, breaking, and learning on repeat</span>.
                         </p>
 
                         <Magnet padding={12} magnetStrength={4} wrapperClassName="cursor-target" style={{ marginTop: 'clamp(2.25rem, 3vw, 3rem)' }}>

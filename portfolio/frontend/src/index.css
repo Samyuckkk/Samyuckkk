@@ -1,6 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Anton&family=Anton+SC&family=Asset&family=Badeen+Display&family=Bebas+Neue&family=Chango&family=Climate+Crisis&family=Mrs+Saint+Delafield&family=Notable&family=Sacramento&family=Spicy+Rice&family=Syncopate:wght@700&display=swap');
 @import "tailwindcss";
 
+:root {
+    --portfolio-sunburst: radial-gradient(circle at center, #FFD500 0%, #FFC300 65%, #FFAA00 100%);
+}
+
 @font-face {
     font-family: 'Rockybilly';
     src: url('./assets/fonts/Rockybilly.ttf') format('truetype');
@@ -40,7 +44,7 @@ body{
     position: relative;
     width: 100vw;
     height: 100vh;
-    background: radial-gradient(circle at center, #FFD500 0%, #FFC300 65%, #FFAA00 100%);
+    background: var(--portfolio-sunburst);
     display: flex;
     justify-content: center;
     align-items: center;

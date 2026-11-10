@@ -123,6 +123,8 @@ const TargetCursor = ({
     const getOffset = () => getContainingBlockOffset(containingBlockRef.current);
 
     let activeTarget = null;
+    let activeTargetColor = null;
+    let activeColorHost = null;
     let currentLeaveHandler = null;
     let resumeTimeout = null;
 
@@ -131,6 +133,40 @@ const TargetCursor = ({
         target.removeEventListener('mouseleave', currentLeaveHandler);
       }
       currentLeaveHandler = null;
+    };
+
+    const setCursorColor = color => {
+      if (!cornersRef.current) return;
+      gsap.to(Array.from(cornersRef.current), {
+        borderColor: color,
+        duration: 0.15,
+        ease: 'power2.out'
+      });
+      if (dotRef.current) {
+        gsap.to(dotRef.current, {
+          backgroundColor: color,
+          duration: 0.15,
+          ease: 'power2.out'
+        });
+      }
+    };
+
+    const colorHostFor = element => element?.closest?.('[data-target-cursor-color]') || null;
+
+    const colorEnterHandler = event => {
+      const host = colorHostFor(event.target);
+      if (!host || host === activeColorHost) return;
+      activeColorHost = host;
+      setCursorColor(host.dataset.targetCursorColor || cursorColor);
+    };
+
+    const colorLeaveHandler = event => {
+      const host = colorHostFor(event.target);
+      if (!host || host !== activeColorHost) return;
+      const nextHost = colorHostFor(event.relatedTarget);
+      if (nextHost === host) return;
+      activeColorHost = nextHost;
+      setCursorColor(nextHost?.dataset.targetCursorColor || cursorColor);
     };
 
     const initialOffset = getOffset();
@@ -276,15 +312,17 @@ const TargetCursor = ({
       spinTl.current?.pause();
       gsap.set(cursor, { rotation: 0 });
 
-      if (cursorColorOnTarget) {
+      const colorSource = target.closest?.('[data-target-cursor-color]');
+      activeTargetColor = colorSource?.dataset.targetCursorColor || cursorColorOnTarget || null;
+      if (activeTargetColor) {
         gsap.to(corners, {
-          borderColor: cursorColorOnTarget,
+          borderColor: activeTargetColor,
           duration: 0.15,
           ease: 'power2.out'
         });
         if (dotRef.current) {
           gsap.to(dotRef.current, {
-            backgroundColor: cursorColorOnTarget,
+            backgroundColor: activeTargetColor,
             duration: 0.15,
             ease: 'power2.out'
           });
@@ -323,20 +361,10 @@ const TargetCursor = ({
 
         activeTarget = null;
 
-        if (cursorColorOnTarget && cornersRef.current) {
-          gsap.to(Array.from(cornersRef.current), {
-            borderColor: cursorColor,
-            duration: 0.15,
-            ease: 'power2.out'
-          });
-          if (dotRef.current) {
-            gsap.to(dotRef.current, {
-              backgroundColor: cursorColor,
-              duration: 0.15,
-              ease: 'power2.out'
-            });
-          }
+        if (activeTargetColor && cornersRef.current) {
+          setCursorColor(activeColorHost?.dataset.targetCursorColor || cursorColor);
         }
+        activeTargetColor = null;
 
         if (cornersRef.current) {
           const corners = Array.from(cornersRef.current);
@@ -373,6 +401,8 @@ const TargetCursor = ({
       target.addEventListener('mouseleave', leaveHandler);
     };
 
+    window.addEventListener('mouseover', colorEnterHandler, { passive: true });
+    window.addEventListener('mouseout', colorLeaveHandler, { passive: true });
     window.addEventListener('mouseover', enterHandler, { passive: true });
 
     const resizeHandler = () => {
@@ -385,6 +415,8 @@ const TargetCursor = ({
         gsap.ticker.remove(tickerFnRef.current);
       }
       window.removeEventListener('mousemove', moveHandler);
+      window.removeEventListener('mouseover', colorEnterHandler);
+      window.removeEventListener('mouseout', colorLeaveHandler);
       window.removeEventListener('mouseover', enterHandler);
       window.removeEventListener('scroll', scrollHandler);
       window.removeEventListener('resize', resizeHandler);
