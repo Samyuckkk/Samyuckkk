@@ -1,9 +1,57 @@
-import { useEffect, useState, useCallback } from "react";
+import { memo, useEffect, useState, useCallback, useRef } from "react";
 import axios from "axios";
 import ScrollStack, { ScrollStackItem } from "./ScrollStack";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 const pad = (n) => String(n + 1).padStart(2, "0");
+
+function ProjectMagnet({ children }) {
+  const innerRef = useRef(null);
+
+  useEffect(() => {
+    const inner = innerRef.current;
+    const hoverMedia = window.matchMedia('(hover: hover) and (pointer: fine)');
+    if (!inner || !hoverMedia.matches) return undefined;
+
+    let frame = 0;
+    let pointer = null;
+
+    const updatePosition = () => {
+      frame = 0;
+      if (!pointer || !inner) return;
+      const rect = inner.getBoundingClientRect();
+      const x = (pointer.x - (rect.left + rect.width / 2)) * 0.16;
+      const y = (pointer.y - (rect.top + rect.height / 2)) * 0.16;
+      inner.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    };
+
+    const onMove = event => {
+      pointer = { x: event.clientX, y: event.clientY };
+      if (!frame) frame = requestAnimationFrame(updatePosition);
+    };
+
+    const onLeave = () => {
+      pointer = null;
+      if (frame) cancelAnimationFrame(frame);
+      frame = 0;
+      inner.style.transform = 'translate3d(0, 0, 0)';
+    };
+
+    inner.addEventListener('mousemove', onMove);
+    inner.addEventListener('mouseleave', onLeave);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      inner.removeEventListener('mousemove', onMove);
+      inner.removeEventListener('mouseleave', onLeave);
+    };
+  }, []);
+
+  return (
+    <span className="pj-magnet">
+      <span ref={innerRef} className="pj-magnet-inner">{children}</span>
+    </span>
+  );
+}
 
 /* ─── Icons ───────────────────────────────────────────────────────────── */
 function GithubIcon() {
@@ -30,7 +78,7 @@ function ExternalIcon() {
 }
 
 /* ─── Project Card ────────────────────────────────────────────────────── */
-function ProjectCard({ project, index }) {
+const ProjectCard = memo(function ProjectCard({ project, index }) {
   const [imgError, setImgError] = useState(false);
   const screenshot = !imgError && project.screenshots?.[0] ? project.screenshots[0] : null;
   const hasGithub = !!project.githubLink?.trim();
@@ -56,11 +104,11 @@ function ProjectCard({ project, index }) {
   const actionLabel = isDriveDoc ? "Documentation" : "Live Demo";
 
   return (
-    <div className="pj-card" id={`project-card-${index}`}>
+    <div className="pj-card" id={`project-card-${index}`} data-target-cursor-color="#a161f4">
       <div className="pj-card-header">
         <div className="pj-card-header-left">
           <span className="pj-num-badge">{pad(index)}</span>
-          <h3 className="pj-card-title" title={project.title}>{project.title}</h3>
+          <h3 className="pj-card-title no-cursor-target" title={project.title}>{project.title}</h3>
         </div>
         <span className="pj-type-pill">{typeLabel}</span>
       </div>
@@ -85,6 +133,7 @@ function ProjectCard({ project, index }) {
             className="pj-screenshot"
             onError={() => setImgError(true)}
             loading="lazy"
+            decoding="async"
           />
         </div>
       ) : (
@@ -96,34 +145,38 @@ function ProjectCard({ project, index }) {
       {(hasGithub || hasDeployment) && (
         <div className="pj-actions">
           {hasGithub && (
-            <a
-              href={project.githubLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="pj-btn pj-btn-dark cursor-target"
-            >
-              <GithubIcon />
-              <span>View Code</span>
-              <ArrowRight />
-            </a>
+            <ProjectMagnet>
+              <a
+                href={project.githubLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pj-btn pj-btn-dark cursor-target"
+              >
+                <GithubIcon />
+                <span>View Code</span>
+                <ArrowRight />
+              </a>
+            </ProjectMagnet>
           )}
           {hasDeployment && (
-            <a
-              href={project.deploymentLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="pj-btn pj-btn-light cursor-target"
-            >
-              <ExternalIcon />
-              <span>{actionLabel}</span>
-              <ArrowRight />
-            </a>
+            <ProjectMagnet>
+              <a
+                href={project.deploymentLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pj-btn pj-btn-light cursor-target"
+              >
+                <ExternalIcon />
+                <span>{actionLabel}</span>
+                <ArrowRight />
+              </a>
+            </ProjectMagnet>
           )}
         </div>
       )}
     </div>
   );
-}
+});
 
 /* ─── Timeline ────────────────────────────────────────────────────────── */
 function ProjectTimeline({ projects, activeIndex, onSelect }) {
@@ -258,11 +311,11 @@ export default function MyProjects() {
           <div className="pj-left">
             <div className="pj-left-inner">
               <div className="pj-heading-box">
+                {/* <h2 className="pj-heading">MY<br />PROJECTS.</h2> */}
                 <h2 className="pj-heading">MY<br />PROJECTS.</h2>
               </div>
               <p className="pj-desc">
-                A collection of projects where I turned ideas into real products,
-                solving problems and learning something new along the way.
+                A collection of things that started with “I have an idea…”
               </p>
             </div>
           </div>
@@ -326,7 +379,11 @@ const CSS = `
 .pj-section {
   position: relative;
   width: 100%;
-  background: radial-gradient(circle at center, #FFD500 0%, #FFC300 65%, #FFAA00 100%);
+  background: var(--portfolio-sunburst);
+  background-attachment: fixed;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: 100vw 100vh;
 }
 .pj-section--state {
   min-height: 60vh;
@@ -567,6 +624,13 @@ const CSS = `
   gap: 12px;
   flex-wrap: wrap;
   margin-top: 2px;
+}
+.pj-magnet { display: inline-flex; }
+.pj-magnet-inner {
+  display: inline-flex;
+  transform: translate3d(0, 0, 0);
+  transition: transform 0.22s ease-out;
+  will-change: transform;
 }
 .pj-btn {
   display: inline-flex;
@@ -840,7 +904,7 @@ const CSS = `
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pj-card, .pj-timeline-dot, .pj-mobile-dot, .pj-btn {
+  .pj-card, .pj-timeline-dot, .pj-mobile-dot, .pj-btn, .pj-magnet-inner {
     transition: none !important;
     animation: none !important;
   }

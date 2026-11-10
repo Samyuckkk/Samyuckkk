@@ -82,7 +82,22 @@ const ScrollStack = ({
       onActiveChange,
     };
     scheduleRef.current?.();
-  });
+  }, [
+    itemDistance,
+    itemStackDistance,
+    stackPosition,
+    itemScale,
+    baseScale,
+    dimAmount,
+    blurAmount,
+    tiltAmount,
+    rotationAmount,
+    holdDistance,
+    smoothScroll,
+    snap,
+    onStackComplete,
+    onActiveChange,
+  ]);
 
   useLayoutEffect(() => {
     const root = rootRef.current;
@@ -106,6 +121,10 @@ const ScrollStack = ({
     let last = 0;
     let points = [];
     let reach = 0;
+    let activeIndex = -1;
+    let slots = [];
+    let heights = [];
+    let measurementsDirty = true;
 
     const readScroll = () => (windowed ? window.scrollY : root.scrollTop);
     const maxScroll = () =>
@@ -125,14 +144,17 @@ const ScrollStack = ({
     const update = () => {
       frame = 0;
       const settings = settingsRef.current;
-      const slots = Array.from(inner.children).filter(child => child.hasAttribute('data-stack-slot'));
+      if (measurementsDirty) {
+        slots = Array.from(inner.children).filter(child => child.hasAttribute('data-stack-slot'));
+        heights = slots.map(slot => slot.offsetHeight);
+        measurementsDirty = false;
+      }
       if (!settings || !slots.length) return;
 
       const viewHeight = windowed ? window.innerHeight : root.clientHeight;
       const viewTop = windowed ? 0 : root.getBoundingClientRect().top + root.clientTop;
       const stackTop = resolveOffset(settings.stackPosition, viewHeight);
       const offset = settings.itemStackDistance;
-      const heights = slots.map(slot => slot.offsetHeight);
       const tops = slots.map(slot => slot.getBoundingClientRect().top);
       const lastPin = stackTop + (slots.length - 1) * offset;
       const padTop = windowed ? 0 : stackTop;
@@ -141,16 +163,18 @@ const ScrollStack = ({
         inner.style.paddingTop = `${value}px`;
       });
 
-      let flow = inner.getBoundingClientRect().top + window.scrollY;
-      if (!windowed) {
-        flow = inner.getBoundingClientRect().top + readScroll() - viewTop + padTop;
+      if (settings.snap) {
+        let flow = inner.getBoundingClientRect().top + window.scrollY;
+        if (!windowed) {
+          flow = inner.getBoundingClientRect().top + readScroll() - viewTop + padTop;
+        }
+        points = heights.map((height, i) => {
+          const point = flow - stackTop - i * offset;
+          flow += height + settings.itemDistance;
+          return point;
+        });
+        reach = Math.max(40, (heights[0] + settings.itemDistance - offset) / 2);
       }
-      points = heights.map((height, i) => {
-        const point = flow - stackTop - i * offset;
-        flow += height + settings.itemDistance;
-        return point;
-      });
-      reach = Math.max(40, (heights[0] + settings.itemDistance - offset) / 2);
 
       // endHeight determines hold distance after final card reaches stack position
       const endHeight =
@@ -216,7 +240,10 @@ const ScrollStack = ({
             activeIdx = j;
           }
         }
-        settings.onActiveChange(activeIdx);
+        if (activeIdx !== activeIndex) {
+          activeIndex = activeIdx;
+          settings.onActiveChange(activeIdx);
+        }
       }
 
       if (moved) schedule();
@@ -306,7 +333,11 @@ const ScrollStack = ({
       settleSoon();
     };
 
-    const observer = new ResizeObserver(schedule);
+    const invalidateMeasurements = () => {
+      measurementsDirty = true;
+      schedule();
+    };
+    const observer = new ResizeObserver(invalidateMeasurements);
     observer.observe(root);
     observer.observe(inner);
     target.addEventListener('scroll', onScroll, { passive: true });

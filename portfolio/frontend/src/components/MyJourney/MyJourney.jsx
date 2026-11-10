@@ -73,6 +73,8 @@ function JourneyCard({ item }) {
             src={item.companyLogo}
             alt={item.company}
             className="journey-logo"
+            loading="lazy"
+            decoding="async"
           />
         )}
         <div>
@@ -106,6 +108,7 @@ export default function MyJourney() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const sectionRef = useRef(null);
+  const layoutRef = useRef(null);
   const trackRef = useRef(null);
   const prefersReducedMotion =
     typeof window !== "undefined" &&
@@ -132,7 +135,7 @@ export default function MyJourney() {
   /* scroll animation — desktop only */
   useEffect(() => {
     if (prefersReducedMotion) return;
-    if (!trackRef.current || !sectionRef.current) return;
+    if (!trackRef.current || !sectionRef.current || !layoutRef.current) return;
     if (experiences.length === 0) return;
     if (window.innerWidth < 768) return;
 
@@ -140,7 +143,8 @@ export default function MyJourney() {
     const id = setTimeout(() => {
       const track = trackRef.current;
       const section = sectionRef.current;
-      if (!track || !section) return;
+      const layout = layoutRef.current;
+      if (!track || !section || !layout) return;
 
       const trackH = track.scrollHeight;
       const viewH = window.innerHeight;
@@ -150,12 +154,13 @@ export default function MyJourney() {
         gsap.to(track, {
           y: -travelDist,
           ease: "none",
+          force3D: true,
           scrollTrigger: {
-            trigger: section,
+            trigger: layout,
             start: "top top",
             end: () => `+=${travelDist + viewH * 0.3}`,
             scrub: 1,
-            pin: true,
+            pin: layout,
             anticipatePin: 1,
             invalidateOnRefresh: true,
           },
@@ -219,7 +224,7 @@ export default function MyJourney() {
         </div>
 
         {/* ── two-column layout (desktop) / cards-only block (mobile) ── */}
-        <div className="journey-layout">
+        <div ref={layoutRef} className="journey-layout">
 
           {/* LEFT — desktop only */}
           <div className="journey-left">
@@ -228,8 +233,7 @@ export default function MyJourney() {
                 MY<br />STORY SO FAR..
               </h2>
               <p className="journey-intro">
-                A collection of milestones, roles, and experiences that have
-                shaped who I am as a developer and problem-solver.
+                A chronological record of me trying to look employable.
               </p>
             </div>
           </div>
@@ -272,7 +276,11 @@ const JOURNEY_CSS = `
 .journey-section {
   position: relative;
   width: 100%;
-  background: radial-gradient(circle at center, #FFD500 0%, #FFC300 65%, #FFAA00 100%);
+  background: var(--portfolio-sunburst);
+  background-attachment: fixed;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: 100vw 100vh;
 }
 
 .journey-section--loading {
@@ -296,7 +304,7 @@ const JOURNEY_CSS = `
   inset: 0;
   pointer-events: none;
   z-index: 1;
-  opacity: 0.08;
+  opacity: 0.12;
   background: #ffffff;
   filter: url(#noiseFilter);
   mix-blend-mode: multiply;
