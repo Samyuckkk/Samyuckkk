@@ -4,6 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import TiltedCard from "../TiltedCard/TiltedCard";
 import Magnet from "../Magnet/Magnet";
 import LogoLoop from "../LogoLoop/LogoLoop";
+import AnimatedContent from "../AnimatedContent/AnimatedContent";
 import { 
     SiReact, 
     SiNextdotjs, 
@@ -100,7 +101,7 @@ export default function CinematicAbout() {
                 <div className="absolute inset-0 bg-white pointer-events-none z-[1] opacity-[0.02] filter url(#noiseFilter)" />
 
                 {/* ── ROW 1: Two-column grid ── */}
-                <div className="relative z-10 w-full grid grid-cols-1 lg:grid-cols-[1.3fr_0.9fr] gap-12 lg:gap-20 xl:gap-24 items-center">
+                <AnimatedContent distance={100} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1} className="relative z-10 w-full grid grid-cols-1 lg:grid-cols-[1.3fr_0.9fr] gap-12 lg:gap-20 xl:gap-24 items-center">
 
                     {/* LEFT COLUMN: Heading + Bio + Button */}
                     <div className="flex flex-col items-start w-full">
@@ -171,10 +172,10 @@ export default function CinematicAbout() {
                             }
                         />
                     </div>
-                </div>
+                </AnimatedContent>
 
                 {/* ── ROW 2: Full-width tech stack ── */}
-                <div className="relative z-10" style={{ width: 'clamp(95%, 90vw, 90%)', margin: '0 auto' }}>
+                <AnimatedContent distance={100} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1} className="relative z-10" style={{ width: 'clamp(95%, 90vw, 90%)', margin: '0 auto' }}>
                     <LogoLoop
                         logos={techLogos}
                         speed={60}
@@ -187,7 +188,7 @@ export default function CinematicAbout() {
                         fadeOutColor="#0c0c0e"
                         ariaLabel="Technology stack"
                     />
-                </div>
+                </AnimatedContent>
             </div>
         </section>
     );

@@ -197,6 +197,8 @@ const ScrollStack = ({
       }
 
       const dimStep = Math.min(Math.max(settings.dimAmount, 0), 1);
+      const shouldBlur = settings.blurAmount > 0;
+      const shouldDim = dimStep > 0;
       slots.forEach((slot, i) => {
         const card = slot.firstElementChild;
         if (!card) return;
@@ -205,8 +207,6 @@ const ScrollStack = ({
         const scale = Math.max(Math.min(settings.baseScale, 1), 1 - depth * settings.itemScale);
         const tilt = -lean * settings.tiltAmount;
         const turn = lean * settings.rotationAmount * (i % 2 ? -1 : 1);
-        const blur = depth * settings.blurAmount;
-        const dim = 1 - Math.pow(1 - dimStep, depth);
         const transform =
           depth < 0.0005
             ? ''
@@ -214,12 +214,18 @@ const ScrollStack = ({
         write(`transform${i}`, transform, value => {
           card.style.transform = value;
         });
-        write(`filter${i}`, blur > 0.01 ? `blur(${blur.toFixed(2)}px)` : '', value => {
-          card.style.filter = value;
-        });
-        write(`dim${i}`, dim.toFixed(3), value => {
-          card.style.setProperty('--scroll-stack-dim', value);
-        });
+        if (shouldBlur) {
+          const blur = depth * settings.blurAmount;
+          write(`filter${i}`, blur > 0.01 ? `blur(${blur.toFixed(2)}px)` : '', value => {
+            card.style.filter = value;
+          });
+        }
+        if (shouldDim) {
+          const dim = 1 - Math.pow(1 - dimStep, depth);
+          write(`dim${i}`, dim.toFixed(3), value => {
+            card.style.setProperty('--scroll-stack-dim', value);
+          });
+        }
       });
 
       const done = slots.length > 1 && lastCover >= 0.999;
@@ -304,7 +310,7 @@ const ScrollStack = ({
 
     const onScroll = () => {
       schedule();
-      if (!gliding) settleSoon();
+      if (!gliding && settingsRef.current?.snap) settleSoon();
     };
 
     const onWheel = event => {
@@ -323,11 +329,13 @@ const ScrollStack = ({
     };
 
     const onPress = () => {
+      if (!settingsRef.current?.snap) return;
       pressed = true;
       window.clearTimeout(rest);
     };
 
     const onRelease = () => {
+      if (!settingsRef.current?.snap) return;
       if (!pressed) return;
       pressed = false;
       settleSoon();
@@ -341,7 +349,8 @@ const ScrollStack = ({
     observer.observe(root);
     observer.observe(inner);
     target.addEventListener('scroll', onScroll, { passive: true });
-    target.addEventListener('wheel', onWheel, { passive: false });
+    const needsWheelHandler = !(windowed && window.lenis);
+    if (needsWheelHandler) target.addEventListener('wheel', onWheel, { passive: false });
     target.addEventListener('pointerdown', onPress, { passive: true });
     window.addEventListener('pointerup', onRelease, { passive: true });
     window.addEventListener('pointercancel', onRelease, { passive: true });
@@ -360,7 +369,7 @@ const ScrollStack = ({
       window.clearTimeout(rest);
       observer.disconnect();
       target.removeEventListener('scroll', onScroll);
-      target.removeEventListener('wheel', onWheel);
+      if (needsWheelHandler) target.removeEventListener('wheel', onWheel);
       target.removeEventListener('pointerdown', onPress);
       window.removeEventListener('pointerup', onRelease);
       window.removeEventListener('pointercancel', onRelease);
