@@ -3,6 +3,7 @@ import axios from "axios";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Magnet from "../Magnet/Magnet";
+import AnimatedContent from "../AnimatedContent/AnimatedContent";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -212,7 +213,7 @@ export default function MyJourney() {
 
         {/* Mobile heading — in-flow, scrolls naturally, no pinning */}
         <div className="journey-mobile-static-header">
-          <div className="journey-left-content">
+          <AnimatedContent distance={100} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1} className="journey-left-content">
             <h2 className="journey-heading notable-regular no-cursor-target">
               MY<br />STORY SO FAR..
             </h2>
@@ -220,7 +221,7 @@ export default function MyJourney() {
               A collection of milestones, roles, and experiences that have
               shaped who I am as a developer and problem-solver.
             </p>
-          </div>
+          </AnimatedContent>
         </div>
 
         {/* ── two-column layout (desktop) / cards-only block (mobile) ── */}
@@ -228,14 +229,14 @@ export default function MyJourney() {
 
           {/* LEFT — desktop only */}
           <div className="journey-left">
-            <div className="journey-left-content">
+            <AnimatedContent distance={100} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1} className="journey-left-content">
               <h2 className="journey-heading notable-regular no-cursor-target">
                 MY<br />STORY SO FAR..
               </h2>
               <p className="journey-intro">
                 A chronological record of me trying to look employable.
               </p>
-            </div>
+            </AnimatedContent>
           </div>
 
           {/* RIGHT — scrolling timeline */}

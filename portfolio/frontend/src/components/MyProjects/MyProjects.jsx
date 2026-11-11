@@ -1,6 +1,7 @@
 import { memo, useEffect, useState, useCallback, useRef } from "react";
 import axios from "axios";
 import ScrollStack, { ScrollStackItem } from "./ScrollStack";
+import AnimatedContent from "../AnimatedContent/AnimatedContent";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 const pad = (n) => String(n + 1).padStart(2, "0");
@@ -309,7 +310,7 @@ export default function MyProjects() {
 
           {/* LEFT: Heading and Introduction in normal document flow */}
           <div className="pj-left">
-            <div className="pj-left-inner">
+            <AnimatedContent distance={100} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1} className="pj-left-inner">
               <div className="pj-heading-box">
                 {/* <h2 className="pj-heading">MY<br />PROJECTS.</h2> */}
                 <h2 className="pj-heading">MY<br />PROJECTS.</h2>
@@ -317,7 +318,7 @@ export default function MyProjects() {
               <p className="pj-desc">
                 A collection of things that started with “I have an idea…”
               </p>
-            </div>
+            </AnimatedContent>
           </div>
 
           {/* MOBILE TIMELINE BAR (Narrow screens) */}

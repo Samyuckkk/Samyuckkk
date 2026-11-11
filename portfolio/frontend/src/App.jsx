@@ -13,6 +13,7 @@ import ContactModal from "./components/ContactModal/ContactModal";
 import CinematicAbout from "./components/AboutMe/CinematicAbout";
 import MyProjects from "./components/MyProjects/MyProjects";
 import MyJourney from "./components/MyJourney/MyJourney";
+import AnimatedContent from "./components/AnimatedContent/AnimatedContent";
 
 import avatarBW from "./assets/2D Vector Black&White.png";
 import avatarColor from "./assets/2D Vector Colored.png";
@@ -185,19 +186,20 @@ const lenis = new Lenis({
                         <div className="hero-noise" />
 
                         {/* Hero Content Wrapper (Foreground) */}
-                        <motion.div 
-                            className="hero-content"
-                            initial={{ opacity: 0, y: 60 }}
-                            animate={{
-                                opacity: 1,
-                                y: 0,
-                            }}
-                            transition={{
-                                duration: 1.2,
-                                delay: 0.3,
-                                ease: [0.16, 1, 0.3, 1], // easeOutExpo
-                            }}
-                        >
+                        <AnimatedContent distance={100} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1}>
+                            <motion.div 
+                                className="hero-content"
+                                initial={{ opacity: 0, y: 60 }}
+                                animate={{
+                                    opacity: 1,
+                                    y: 0,
+                                }}
+                                transition={{
+                                    duration: 1.2,
+                                    delay: 0.3,
+                                    ease: [0.16, 1, 0.3, 1], // easeOutExpo
+                                }}
+                            >
                             {/* Line 1: Samyak */}
                             <span className="hero-name-line name-samyak select-none">
                                 Samyak
@@ -232,7 +234,8 @@ const lenis = new Lenis({
                                     />
                                 </div>
                             </Magnet>
-                        </motion.div>
+                            </motion.div>
+                        </AnimatedContent>
 
                         {/* Rotating Text Badge - Positioned at bottom right */}
                         <div className="hero-badge absolute bottom-6 left-1/2 -translate-x-1/2 sm:right-8 sm:left-auto sm:translate-x-0 sm:bottom-8 z-[100] flex items-center gap-2.5 font-bold text-xl sm:text-2xl select-none w-max">
