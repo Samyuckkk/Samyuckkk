@@ -31,7 +31,7 @@ export default function AboutMe() {
     }, []);
 
     const handleDownload = () => {
-        const resumeUrl = "https://ik.imagekit.io/samyuck/Portfolio/Resume/f58465be-7dae-4225-8065-978e37ab6323__IKJ7QJxGH";
+        const resumeUrl = "https://ik.imagekit.io/samyuck/Portfolio/Resume/8282c381-bea5-4ce5-893c-bb433c37525c_1mqKqWHW2";
         window.open(resumeUrl, '_blank');
     };
 
