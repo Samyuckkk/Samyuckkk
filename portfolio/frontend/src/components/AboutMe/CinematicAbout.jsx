@@ -83,7 +83,7 @@ export default function CinematicAbout() {
     const isTablet = dimensions.width >= 640 && dimensions.width < 1024;
 
     const handleDownload = () => {
-        window.open("https://ik.imagekit.io/samyuck/Portfolio/Resume/f58465be-7dae-4225-8065-978e37ab6323__IKJ7QJxGH", '_blank');
+        window.open("https://ik.imagekit.io/samyuck/Portfolio/Resume/8282c381-bea5-4ce5-893c-bb433c37525c_1mqKqWHW2?updatedAt=1795544175996", '_blank');
     };
 
     return (
